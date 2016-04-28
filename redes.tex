@@ -16,8 +16,363 @@
 \tableofcontents
 
 \chapter{INTRODUCCIÓN}
+\par Una red de computadoras es un conjunto de computadoras autónomas 
+interconectadas. Dos computadoras están interconectadas si pueden intercambiar 
+información. La conexión puede hacerse por medio de: cable de cobre, fibra óptica, 
+microondas, rayos infrarrojos, satélites de comunicaciones, etc.
+\par Si bien los tipos de redes no cambian, si evoluciona la tecnología de hardware en 
+la que se basa, y como consecuencia el funcionamiento o desempeño de las redes de 
+cada tipo van mejorando más y más.
+
 \section{Uso de las redes de las computadoras}
+\par Aplicaciones de negocios
+\par Aplicaciones domésticas
+\par Usuarios móviles
+\par Cuestiones sociales
+
+\section{Hardware de red}
+\par Dos tipos de tecnología de transmisión:
+	\begin{itemize}
+		\item Las redes de difusión tienen un solo canal de comunicación, por lo que 
+		todas las máquinas de la red lo comparten.
+		\item En las redes punto a punto un paquete podría tener que visitar una o más 
+		máquinas intermedias. Puede haber varias rutas diferentes y hay que encontrar la 
+		correcta.
+	\end{itemize}
+\par Las redes más pequeñas suelen usar difusión, mientras que las más grandes 
+conectan redes pequeñas punto a punto.
+
+\subsection{Redes de área local}
+\par Las redes de área local, generalmente llamadas LAN (Local Area Networks), son 
+redes de propiedad privada que operan dentro de un solo edificio, como una casa, 
+oficina o fábrica.
+
+\subsubsection{Difusión}
+\par Si una máquina envía un mensaje todas las demás lo reciben, dentro del mensaje 
+se indica el destinatario. Una máquina al recibir un paquete analiza si va destinado a 
+ella y en ese caso lo procesa, sino lo ignora. Otras variantes son: \textit{broadcasting}, 
+consiste en enviar un paquete a todos y \textit{multicasting} envia a un grupo 
+particular.
+\par Ejemplos de redes de área local son WIFI y Ethernet.
+
+\textbf{WiFi:} son redes inalámbricas, operan a velocidades desde 11 hasta cientos de 
+Mbps.
+
+\textbf{Ethernet:} Son redes de difusión basada en bus con control descentralizado 
+que funcionan de 10 Mbps a 10 Gbps. Se puede transmitir siempre que se desee; si 
+dos paquetes colisionan, es decir mas de una máquina escribiendo simultáneamente en 
+el cable, se espera un tiempo aleatorio e intenta más tarde.
+
+\begin{center} 
+	\includegraphics[width=8cm, height=6cm]{./imagenes/arealocal.png} 
+\end{center}
+
+\subsection{Redes de área metropolitana}
+\par Una Red de área Metropolitana, o MAN (Metropolitan Area Network), cubre toda 
+una ciudad. \\
+
+\textbf{Ejemplo 1:} MAN basada en TV por cable
+	\begin{itemize}
+		\item Cable coaxil para unir varias casas.
+		\item Elementos de conmutación.
+		\item Elementos de conmuntación se unen por cables de fibra óptica.
+	\end{itemize}
+	
+	\begin{center}
+		\includegraphics[width=10cm, height=6cm]{./imagenes/metropolitana1.png} 
+	\end{center}
+
+\textbf{Ejemplo 2:} Wimax (estándar 802.16).
+	\begin{itemize}
+		\item Se envían paquetes por el aire en lugar de usar cable o redes telefónicas.
+		\item Se conecta a internet (a una red dorsal).
+		\item Se puede acceder a la red desde computadoras en casas o edificios, o 
+		desde vehículos en movimiento.
+	\end{itemize}	 
+	
+	\begin{center}
+		\includegraphics[width=10cm, height=6cm]{./imagenes/metropolitana2.png} 
+	\end{center}
+
+\subsection{Redes de área amplia}
+\par Una Red de área Amplia, o WAN (Wide Area Network), abarca una extensa área 
+geográfica, por lo general un país o continente. Son redes punto a punto: dos 
+dispositivos están conectados entre sí por medio de un cable, esta regla da lugar a lo 
+que se llama subred.
+\par Una \textbf{subred} posee varios enrutadores conectados entre sí formando un 
+grafo. A una subred pueden estar conectadas computadoras o redes de área local 
+enteras, para ir de una máquina a otra hay distintas rutas alternativas.
+\par Los elementos de conmutación, tambien llamados enrutadores dependiendo de la capa de red en la actúan, conectan tres o más líneas de transmisión. Los datos por línea de entrada se envían por alguna línea de salida elegida especialmente.
+Dos enrutadores que no comparten una línea de transmisión se conectan indirectamente a través de otros enrutadores.
+
+Un paquete se envía de un enrutador a otro a través de enrutadores intermedios, almacenándose enteramente en cada enrutador intermedio hasta que la línea requerida de salida esté libre y luego se reenvía (store-and-forward). Otra forma sería no guardar el mensaje, no esperar a que llegue entero antes de reenviarlo (cut-through).
+
+Los mensajes se dividen en paquetes, los cuales tienen un número de secuencia. Estos paquetes se mandan en la red de uno en uno. Los paquetes se van depositando en el host receptor que reensambla el mensaje original. En algunas redes todos los paquetes del mensaje deben seguir la misma ruta, en otras cada paquete se enruta por separado. Las decisiones de enrutamiento se hacen de manera local, un algoritmo de enrutamiento describe la manera en que un enrutador toma esa decisión.
+
+\subsubsection{Ejemplos de WAN:}
+\begin{itemize}
+\item Sistema telefónico fijo (Ej:. ADSL):
+\begin{itemize}
+	\item Cada domicilio conectado por un cable de cobre a una End office
+ 	\item Toll offices usadas para reenvío de mensajes.
+ 	\item Toll offices unidas por cables de fibra óptica llamados troncales.
+\end{itemize}	
+
+\begin{center} 
+	\includegraphics[width=8cm, height=6cm]{./imagenes/telefonico.png} 
+\end{center}
+
+\item Una red de teléfonos celulares (Ej: 3G o 4G).
+\begin{itemize}
+	\item Celdas con estaciones base: cada smartphone opera en una celda.
+	\item Celdas conectados a centros de conmutación: para conectar distintas celdas
+ 	\item Centros de conmutación conectados a la red telefónica pública.
+\end{itemize}
+
+\end{itemize}
+
+\par Un proveedor de servicios de internet (PSI) es también una WAN. Los clientes compran conectividad a un PSI y para usar su red.
+
+\subsection{Interredes}
+\par Existen mucha redes en el mundo, a veces con hardware y software diferente. 
+Con frecuencia las personas conectadas a una red desean comunicarse con las 
+personas conectadas a otra red diferente. Las puertas de enlace proveen la conexión y 
+la traducción necesaria. Un conjunto de redes interconectadas se llama interred 
+(internet), Internet es una inter red.
+
+\begin{center} 
+	\includegraphics[width=8cm, height=6cm]{./imagenes/interred.png} 
+\end{center}
+
 \section{Software de red}
+\par Las primeras redes de computadoras se diseñaron teniendo en cuenta al hardware 
+como punto principal y al software como secundario. Pero esta estrategia ya no 
+funciona. Ahora el software de red está muy estructurado.
+
+\subsection{Jerarquías de protocolos}
+\par Para reducir la complejidad de su diseño, la mayoría de las redes esta organizada 
+como una pila de capas o niveles, cada una construida a partir de la que esta debajo de 
+ella. El propósito de cada capa es ofrecer ciertos servicios, a las capas superiores, a las 
+cuales no se les muestran los detalles de implementación de los servicios ofrecidos. La 
+capa \textit{N} de una maquina mantiene una conversación con la capa \textit{N} de 
+otra máquina. Las reglas y convenciones utilizadas en esta conversación se conocen 
+como \textbf{protocolo de capa N}.
+\par Cada capa pasa los datos y la información de control a la capa inmediatamente 
+inferior, hasta que se alcanza la capa más baja. Debajo de la capa 1 se encuentra el 
+medio físico, a través del cual ocurre la comunicación real. Entre cada par de capas 
+adyacentes esta una \textbf{interfaz} que define que operaciones y servicios 
+primitivos pone la capa mas baja a disposición de la capa superior inmediata.
+\par El conjunto de capas y protocolos se conoce como \textbf{arquitectura de red} o 
+\textbf{nomenclatura de pila de protocolos}.
+
+\par Un proceso de aplicación se ejecuta en la \textit{capa 5}, la cual produce un 
+mensaje y lo pasa a la \textit{capa 4} para su transmisión. La \textit{capa 4} pone un 
+encabezado en el mensaje para identificarlo y pasa el resultado a la \textit{capa 3}. El 
+encabezado contiene información de control como números de secuencia para que la 
+\textit{capa 4} de la máquina de destino entregue los mensajes en el orden correcto, 
+si las capas inferiores no mantienen la secuencia.
+
+\par En muchas redes no hay limitaciones en el tamaño de los mensajes de la 
+\textit{capa 4}, pero casi siempre hay un límite impuesto por el protocolo de la 
+\textit{capa 3}, la cual debe dividir  los mensajes que llegan en unidades mas 
+pequeñas llamadas \textbf{paquetes} y a cada paquete colocarle un encabezado.
+\par La \textit{capa 3} decide cuál de las líneas que salen utilizar y pasa los paquetes 
+a la \textit{capa 2} que no solo agrega un encabezado a cada pieza sino tambien un 
+terminador, y pasa la unidad resultante a la \textit{capa 1} para su transmisión.
+\par En la máquina receptora el mensaje pasa hacia arriba de capa en capa, perdiendo 
+los encabezados conforme avanza.
+
+\subsection{Aspectos de diseño para las capas}
+
+Algunos de los aspectos claves de diseño que ocurren en la redes están presentes en 
+las diversas capas, cada capa necesita de un mecanismo para identificar a los emisores 
+y a los receptores. Es necesario un método para que un proceso en una máquina 
+especifique con cual otra máquina quiere hablar, además de una forma de 
+\textbf{direccionamiento} a fin de precisar un destino específico.
+
+\par Otras decisiones de diseño conciernen a las reglas de transferencia de datos, en 
+algunos sistemas los datos viajan solo en una dirección, en otros pueden viajar en 
+ambas direcciones.
+
+El control de errores es un aspecto importante porque los circuitos de comunicación 
+física no son perfectos. Muchos códigos de corrección y detección de errores son 
+conocidos, pero los dos extremos de la conexión deben estar de acuerdo en cual es el 
+que se va a utilizar. Además, el receptor debe tener algun medio de decirle al emisor 
+que mensajes se han recibido correctamente y cuáles no.
+
+\par No todos los canales de comunicación conservan el orden en que se envían los 
+mensajes. Para tratar con una posible perdida de secuencia, el protocolo debe incluir 
+un mecanismo que permita al receptor volver a unir los pedazos en forma adecuada. 
+Una solución obvia es numerar las piezas, pero hay que tratar con las piezas que no 
+llegan en orden.
+
+\par Hay que evitar que un emisor rápido sature de datos a un receptor lento. Hay 
+soluciones a este problema donde el receptor proporciona algún tipo de 
+retroalimentación al emisor, directa o indirectamente, dependiendo de la situación real 
+del receptor. A este tema se lo denomina c\textbf{control de flujo}. A veces en la red 
+demasiadas máquinas quieren enviar demasiados mensajes y la red no puede 
+mandarlos a todos, esta sobrecarga se llama \textbf{congestión}. Una solución es que 
+cada máquina emisora reduzca el tráfico de salida.
+
+\par En algunos niveles los procesos son incapaces de aceptar mensajes de longitud 
+arbitraria. Esta propiedad conduce a mecanismos para desensamblar, transmitir y 
+reensamblar mensajes. A este tema en general se lo conoce como 
+\textbf{interconexión de redes}.
+
+\par Cuando es costoso mantener una conexión separada para cada par de procesos 
+de comunicación, la capa subyacente podría decidir usar la misma conexión para 
+múltiples conversaciones sin relación entre si, siempre y cuando esta 
+\textbf{multiplexión} y demultiplexión se realice de manera transparente, cualquier 
+capa la podrá utilizar. La multiplexión se necesita en la capa física, donde múltiples 
+conversaciones comparten un número limitado de circuitos físicos.
+
+\par Cuando hay múltiples rutas entre el origen y el destino se debe elegir la mejor o 
+las mejores entre todas ellas, este tema se llama \textbf{enrutamiento}.
+
+\subsection{Comparación entre servicio orientado a conexión y servicio sin conexión}
+\par Normalmente una capa puede ofrecer distintos tipos de servicio a las capas arriba 
+suyo. El servicio orientado a la conexión, el usuario del servicio primero establece una 
+conexión, la utiliza y luego la abandona. Una conexión funciona como un tubo: el 
+emisor empuja objetos en un extremo y el receptor los toma en el otro extremo. Se 
+conserva el orden en que esos objetos salen y llegan.
+\par En el servicio no orientado a la conexión cada mensaje lleva completa la dirección 
+de destino y cada uno se enruta a través del sistema, independientemente de los 
+demás. Algunos servicios son confiables en el sentido que nunca pierden datos, pero 
+por lo general en un servicio confiable el receptor confirma la recepción de cada 
+mensaje. Al servicio no orientado a la conexión no confiable, es decir sin confirmación 
+de recepción, se lo conoce como servicio de datagramas. 
+\par A veces se desea no tener que establecer una conexión para enviar un mensaje 
+corto, pero la confiabilidad es esencial. Para estas aplicaciones se usa el servicio de 
+\textbf{datagramas confirmados}. En el servicio de \textbf{solicitud-respuesta} el 
+emisor transmite un solo datagrama con una solicitud y luego el receptor envía la 
+respuesta al estilo del modelo cliente-servidor.
+
+
+\section{Modelos de referencia}
+
+\subsection{El modelo de referencia OSI}
+
+\subsubsection{La capa de enlace de datos}
+\par La tarea principal de la capa de enlace de datos es transformar un medio de 
+transmisión puro en una línea de comunicación que aparezca libre de errores de 
+transmisión. El emisor fragmenta los datos de entrada en \textbf{tramas de datos}, y 
+transmite las tramas de manera secuencial. Si el servicio es confiable, el receptor 
+confirma la recepción correcta de cada trama devolviendo una \textbf{trama de 
+confirmación de recepción}.
+\par Otro problema atacado es como hacer que un emisor rápido no sature de datos a 
+un receptor lento: mecanismo de regulación de tráfico. Con frecuencia esta regulación 
+de flujo y el manejo de errores están integrados. Las redes de difusión además 
+consideran como controlar el acceso a un canal compartido. La subcapa de control de 
+acceso al medio se ocupa de esto.
+
+\subsubsection{La capa de red}
+\par La capa de red controla las operaciones de la subred. Hay que determinar cómo se enrutan los paquetes desde su origen a su destino. Si hay demasiados paquetes en la subred al mismo tiempo, se interpondrán en el camino unos y otros lo que hará que se formen cuellos de botella, la capa de red se ocupa de controlar esta congestión.
+\par Cuando un paquete tiene que viajar de una red a otra para llegar a destino pueden surgir varios problemas; el direccionamiento de la segunda red podría ser distinto, la segunda podría no aceptar el paquete porque es demasiado largo, los protocolos podrían ser distintos, etc. La capa de red resuelve estos problemas.
+
+\subsection{El modelo de referencia TCP/IP}
+
+Se eligió una red de conmutación de paquetes basada en una capa de interred no 
+orientada a la conexión.
+– El trabajo de la capa de interred es permitir que los hosts inyecten paquetes dentro de cualquier red y que estos viajen a su destino de manera independiente.
+– Tal vez lleguen en un orden distinto al cual fueron enviados, en cuyo caso las capas mas altas deberán ordenarlos, si se desea una entrega ordenada.
+– La capa de interred define un paquete de formato y protocolo oficial llamado IP (protocolo de internet).
+– Direcciones IP
+• 4 números entre 0 y 255 separados por ‘.’ .
+• P. ej. 200, 45.191.35
+• El trabajo de la capa de interred es entregar paquetes IP al destinatario.
+– El enrutamiento de paquetes es el aspecto principal, con el propósito de evitar la congestión.
+
+ La capa arriba de la capa interred es la capa de transporte, la cual esta diseñada para permitir que las entidades iguales en los hosts de origen y destino puedan llevar a cabo una conversación.
+ Se tienenn dos protocoles de transporte
+– TCP es confiable, orientado a la conexión y permite que un flujo de bytes que se origina en una máquina se entregue sin errores en cualquier otra máquina en la interred.
+ TCP divide el flujo en de bytes entrantes en mensajes discretos y pasa cada uno de ellos a la capa de interred.
+ En el destino el proceso TCP receptor reensambla en el flujo de salida los mensajes recibidos.
+ TCP también maneja el control de flujo para que un emisor rápido no sature con mas mensajes que los que puede manejar a un receptor lento.
+– UDP es un protocolo no confiable y no orientado a la conexión, para aplicaciones que no desean el control de flujo ni la secuenciación de mensajes.
+ Tiene un amplio uso en consultas de solicitud-respuesta de tipo cliente-servidor en un solo envío y en aplicaciones de transmisión de voz y video.
+
+La capa de aplicación contiene todos los protocolos de nivel mas alto: terminal virtual (TELNET), transferencia de archivos (FTP), correo electrónico (SMTP), para resolución de nombres de host en sus direcciones de red (DNS), para páginas web (HTTP).
+
+\subsection{Una crítica al modelo de referencia TCP/IP}
+
+Problemas:
+– No se distingue entre servicio, interfaz y protocolo.
+ O sea no se distingue bien entre especificación e implementación.
+– No es un modelo general: no esta ajustado para describir ninguna pila de protocolos mas que TCP/IP.
+– No se mencionan las capas físicas y de enlace de datos
+– Protocolos altamente entrincherados y difíciles de remplazar.
+
+\section{Redes de ejemplo}
+
+\subsection{Internet}
+\par Internet es un inmenso conjunto de redes diferentes, que usan ciertos 
+protocolos comunes y proporcionan ciertos servicios comunes. A este sistema nadie 
+lo planeo y nadie lo controla. 
+\par Los protocolos TCP e IP están preparados para manejar comunicaciones por 
+interredes. Se desarrollo una interfaz de programación para la red llamada sockets 
+de Berkley.
+
+– Luego se creo el DNS (sistema de nombres de dominios) para organizar máquinas 
+dentro de dominios y resolver nombres de hosts en direcciones IP.
+– Una máquina esta en Internet si ejecuta una pila de protocolos TCP/IP, tiene una 
+dirección IP y puede enviar paquetes a todas las demás maquinas de Internet.
+
+Muchas máquinas pueden llamar a un proveedor de servicios de Internet mediante 
+un modem, recibir direcciones IP temporales y enviar paquetes a otros hosts de 
+Internet.
+
+\subsection{El modelo utilizado en este libro}
+\section{Resumen}
+
+\par Las redes de computadoras tienen muchos usos, tanto para empresas como para 
+individuos, en el hogar y en movimiento. Las empresas usan redes de computadoras 
+para compartir la información corporativa, por lo general mediante el modelo cliente-
+servidor en donde las computadoras de los empleados actúan como clientes que 
+acceden a poderosos servidores en la sala de máquinas. Para los individuos, las redes 
+ofrecen acceso a una variedad de recursos de información y entretenimiento, así como 
+una manera de comprar y vender productos y servicios. Con frecuencia los individuos 
+acceden a Internet por medio de sus proveedores de teléfono o cable en el hogar, 
+aunque cada vez se utiliza más el acceso inalámbrico para laptops y teléfonos. Los 
+avances tecnológicos permiten nuevos tipos de aplicaciones móviles y redes con 
+computadoras integradas a los electrodomésticos y demás dispositivos para el 
+consumidor. Los mismos avances generan cuestiones sociales tales como las 
+relacionadas con la privacidad.
+\par En términos generales, podemos dividir a las redes en LAN, MAN, WAN e 
+interredes. Por lo general las redes LAN cubren todo un edificio y operan a velocidades 
+altas. Las redes MAN comúnmente cubren toda una ciudad. El sistema de televisión 
+por cable es un ejemplo, ya que ahora muchas personas lo utilizan para acceder a 
+Internet. Las redes WAN pueden cubrir un país o continente. Algunas de las 
+tecnologías utilizadas para construir estas redes son de punto a punto (como un 
+cable), mientras que otras son de difusión (como las redes inalámbricas). Las redes se 
+pueden interconectar con enrutadores para formar interredes, de las cuales Internet es 
+el ejemplo más grande y popular. Las redes inalámbricas, como las redes LAN 802.11 
+y de telefonía móvil 3G, también se están volviendo muy populares.
+\par El software de red se basa en los protocolos, que son reglas mediante las cuales 
+los procesos se comunican entre sí. La mayoría de las redes soportan jerarquías de 
+protocolos, en donde cada capa proporciona servicios a la capa inmediata superior y 
+los aísla de los detalles sobre los protocolos que se utilizan en las capas inferiores. Por 
+lo general las pilas de protocolos se basan en el modelo OSI o en el modelo TCP/IP. 
+Ambos modelos tienen capas de enlace, red, transporte y aplicación, pero difieren en 
+las otras capas. Los aspectos de diseño incluyen: confiabilidad, asignación de recursos, 
+crecimiento, seguridad, etc.
+\par Las redes proveen varios servicios a sus usuarios. Estos servicios pueden variar, 
+desde la entrega de paquetes sin conexión de mejor esfuerzo hasta la entrega 
+garantizada orientada a conexión. En algunas redes se proporciona servicio sin 
+conexión en una capa y servicio orientado a conexión en la capa inmediata superior.
+Entre las redes más conocidas están: Internet, la red de telefonía móvil 3G y las redes 
+LAN 802.11. Internet evolucionó de ARPANET, a la que se agregaron otras redes para 
+formar una interred. En realidad la Internet de la actualidad es una colección de 
+muchos miles de redes que utilizan la pila de protocolos TCP/IP. La red de telefonía 
+móvil 3G proporciona acceso inalámbrico y móvil a Internet, con es LAN inalámbricas 
+basadas en el estándar IEEE 802.11 se implementan en muchos hogares y cafés; 
+pueden proporcionar conectividad a velocidades en mayores 100 Mbps. También están 
+surgiendo nuevos tipos de redes, como las redes de sensores integradas y las redes 
+basadas en tecnología RFID.
+Para permitir que varias computadoras se comuniquen entre sí se requiere una gran 
+cantidad de estandarización, tanto en hardware como en software. Las organizaciones 
+tales como ITU-T, ISO, IEEE e IAB administran distintas partes del proceso de 
+estandarización.
+
 
 
 
@@ -451,7 +806,7 @@ La esencia del problema consiste en que cuando X indica Xi a E, E no tiene forma
 		\item Calcular la ruta más corta a todos los demás enrutadores.
 	\end{enumerate}
 
-	
+
 
 \subsection{Enrutamiento jerárquico}
 \subsection{Enrutamiento por difusión}
@@ -463,12 +818,93 @@ La esencia del problema consiste en que cuando X indica Xi a E, E no tiene forma
 \subsection{Desprendimiento de carga}
 
 \section{La capa de internet}
-\subsection{El protocolo IP versión 4}
-\subsection{Direcciónes IP}
-\subsection{IP versión 6}
+	\subsection{El protocolo IP versión 4}
+	\subsection{Direcciónes IP}
+
+
 \subsection{Protocolos de control de Internet}
-\subsection{Conmutación mediante etiquetas y MPLS}
+
+
+%LIsta
+\subsubsection{ARP: Protocolo de Resolución de Direcciones}
+
+	\par Aunque en internet una máquina tiene una o más direcciones IP, estas no pueden usarse para enviar paquetes debido a que el hardware de la capa de enlace de datos no entiende las direcciones de internet. Hoy día la mayoría de los hosts de las compañías y las universidades se une a una LAN por una tarjeta de red que solo entiende direcciones LAN. Por ejemplo cada tarjeta Ethernet viene provista de fábrica con una dirección Ethernet de 48 bits, las tarjetas envían y reciben tramas basadas en direcciones Ethernet de 48 bits pero no saben nada de direcciones IP.
+	
+	\par La pregunta ahora es: ¿Cómo se convierten las direcciones IP en direcciones de la capa de enlace de datos, como Ethernet?. La idea sería que el host de origen dé salida a un paquete de difusión hacia Ethernet preguntando: ¿Quién posee una dirección IP w.x.y.z ?. La difusión llegará a cada máquina en Ethernet y cada una verificará su dirección IP. Al host de destino le bastará con responder con su dirección de Ethernet E y de este modo el host de origen aprende que la dirección IP de w.x.y.z está en el host con la dirección de Ethernet E. Casi cada máquina en Internet ejecuta ARP.
+
+	\par La ventaja de usar ARP es la sencillez. Solo se tiene que asignar a cada máquina una dirección IP y decidir respecto de las máscaras de subred. ARP hace el resto.
+	
+	\par Se pueden hacer optimizaciones para que ARP funcione con más eficiencia.
+	
+		\begin{itemize}
+			\item \underline{Optimización 1:} una vez que una máquina ha ejecutado ARP, guarda el resultado en caso de que en poco tiempo tenga que ponerse de nuevo en contacto con la misma máquina. La próxima vez encontrará la correspondencia en su propia caché, eliminando así la necesidad de una segunda difusión.
+
+			\item \underline{Optimización 2:} en muchos casos el host de destino necesitará devolver una respuesta, forzando también a que se ejecute el ARP para determinar la dirección Ethernet del emisor. Esta difusión de ARP puede evitarse teniendo el host de origen que incluir su correspondencia IP a Ethernet en el paquete ARP. Cuando la difusión de ARP llega al host de destino, se introduce la dirección IP y de Ethernet del origen en el caché del host 2 para su uso futuro.
+			
+			\item \underline{Optimización 3:} cada máquina difunde su correspondencia cuando arranca, esto se hace mediante un ARP que busca su propia dirección IP. No debe haber una respuesta, pero un efecto lateral de la difusión es hacer una entrada en el caché ARP de todas las máquinas, si llega inesperadamente una respuesta, es que la misma dirección IP se ha asignado a dos máquinas. La más reciente debe avisar y no arrancar.
+		\end{itemize}
+
+	\par Para permitir que las asociaciones cambien, por ejemplo, al configurar un host para que use una nueva dirección IP (pero que mantenga su vieja dirección Ethernet), las entradas en la caché ARP deben expirar después de unos cuantos minutos.
+	
+	\par Cuando el host de origen y el host de destino están en distintas Ethernet LAN 1 y LAN 2 respectivamente separadas por enrutadores, si se usa ARP fallará ya que el host de destino no verá la difusión (los enrutadores no envían difusiones a nivel Ethernet). Veamos este problema con un ejemplo en la siguiente figura.
+	
+		\begin{center}
+			\includegraphics[width=9cm, height=6cm]{./imagenes/arp.png} 
+		\end{center}
+
+	\par Viendo la figura de arriba, supongamos que el \textit{host 1} quiere enviar un paquete al \textit{host 4} (192.32.63.8) en la red IE. El \textit{host 1} verá que la dirección IP de destino no está en la red CS. Sabe enviar todo ese tráfico fuera de la red al enrutador, el cual también se conoce como puerta de enlace predeterminada. Por convención, la puerta de enlace predeterminada es la dirección más baja en la red (198.31.65.1). Para enviar una trama al enrutador, el \textit{host 1} debe conocer de todas formas la dirección Ethernet de la interfaz del enrutador en la red CS. Para descubrirla envía una difusión ARP para 198.31.65.1, a partir de la cual aprende E3. Después envía la trama. Los mismos mecanismos de búsqueda se utilizan para enviar un paquete de un enrutador al siguiente, a través de una secuencia de enrutadores en una ruta de Internet.
+	
+	\par Cuando la placa de red de Ethernet del enrutador recibe esta trama, entrega el paquete al software IP. Sabe con base en las máscaras de red que el paquete se debe enviar a la red IE, en donde alcanzará al \textit{host 4}. Si el enrutador no conoce la dirección Ethernet para el \textit{host 4}, entonces usará ARP de nuevo. Las direcciones Ethernet cambian con la trama en cada red, mientras que las direcciones IP permanecen constantes (puesto que indican las terminales a través de todas las redes interconectadas).
+	
+%Lista
 \subsection{OSPF: un protocolo de enrutamiento de puerta de enlace interior}
+	\par Internet se compone de una gran cantidad de \textbf{Sistemas Autónomos}. Cada uno de ellos es manejado por una organización diferente y puede usar su propio algoritmo interno de enrutamiento. Un algoritmo de enrutamiento dentro de un sistema autónomo se llama \textbf{protocolo de puerta de enlace interior (IGP)}; un algoritmo para enrutamiento entre sistemas autónomos se llama protocolo de \textbf{puerta de enlace exterior (EGP)}.
+
+	\par El protocolo de puerta de enlace interior original en internet era un protocolo de vector de distancia (\textit{RIP}). Fue reemplazado en 1979 por un protocolo de estado de enlace. Luego en 1988 se definió un sucesor llamado OSPF (\textbf{Open Shorted Path First}), que se volvió una norma en 1990. Ahora la mayoría de vendedores de enrutadores lo apoyan.
+	
+	\par OSPF tenía una larga lista de requerimientos por cumplir. El algoritmo se tenía que apoyar en una variedad de métricas de distancia como distancia física, retardo, etc. Tenía que ser un algoritmo dinámico que se adaptara rápida y automáticamente a los cambios en la topología. Debía apoyar el enrutamiento con base en el tipo de servicio. El nuevo protocolo tenía que dirigir el tráfico en tiempo real de una manera y el resto del tráfico de otra.
+	
+	\par El nuevo protocolo tenía que balancear la carga, dividiéndola en líneas múltiples. La mayoría de los protocolos anteriores enviaba todos los paquetes por la mejor ruta, incluso si había dos rutas buenas.
+
+	\par Se necesitaba apoyo para los sistemas jerárquicos. Había que tratar con enrutadores que se conectan a internet por medio de un túnel.
+
+	\par OSPF soporta tres tipos de conexiones y redes:
+
+		\begin{enumerate}
+			\item Las líneas punto a punto exactamente entre dos enrutadores.
+			\item Redes de multiacceso con difusión (la mayoría de las LAN).
+			\item Redes de multiacceso con muchos enrutadores, cada uno de los cuales se puede comunicar directamente con los otros.
+		\end{enumerate}
+
+	\par La siguiente figura muestra un sistema autónomo con los tres tipos de redes. En ella se omiten los hosts, ya que en general no desempeñan ningún papel en OSPF.
+
+		\begin{center}
+			\includegraphics[width=8cm, height=5cm]{./imagenes/ospf.png} 
+		\end{center}
+
+	\par OSPF abstrae la topología en un \textbf{grafo dirigido} en el que a cada arco se asigna un costo (distancia, retardo, etc.). Una conexión \textit{punto-punto} entre dos enrutadores se representa por un par de arcos, uno en cada dirección, donde sus pesos pueden ser diferentes. Una red de multiacceso de difusión se representa con un nodo
+para la red en sí, más un nodo para cada enrutador. Los arcos desde el nodo de la red a los enrutadores tienen peso 0, sin embargo son importantes puesto que sin ellos no habrá una ruta a través de la red.
+
+	\par Luego de la construcción del grafo se utiliza al algoritmo de \textit{Dijkstra} para hacer que cada enrutador calcule la ruta más corta desde sí mismo hacia todos los demás nodos. Se pueden encontrar varias rutas que sean igual de cortas. En este caso, OSPF recuerda el conjunto de rutas más cortas y, durante el envío de paquetes, el tráfico se divide entre ellas. Este proceso ayuda a balancear la carga y se conoce como ECMP (\textbf{Equal Cost MultiPath}).
+
+	\par Muchos de los sistemas autónomos (AS) en Internet son grandes por sí mismos y nada sencillos de administrar. Para trabajar a esta escala, OSPF permite dividir un AS en áreas numeradas, en donde un área es una red o un conjunto de redes contiguas y cada área puede contener varias redes dentro de sí misma. Las áreas no se traslapan, algunos enrutadores no necesitan pertenecer a ningún área. Los enrutadores que están totalmente dentro de un área se llaman \textbf{enrutadores internos}.
+
+	\par Cada Sistema Autónomo tiene un área de \textbf{red dorsal}, llamada área 0. Los enrutadores en esta área se llaman \textbf{enrutadores dorsales}. Todas las áreas se conectan a la red dorsal, posiblemente mediante túneles, de modo que es posible ir desde cualquier área en el AS a cualquier otra área en el AS mediante la red dorsal. En el grafo, un túnel se representa como otro arco más con un costo. Al igual que con otras áreas, la topología de la red troncal no es visible fuera de esta.
+
+	\par Cada enrutador que se conecta a dos o más áreas se llama \textbf{enrutador de borde de área} (\textit{EBA}) y es parte de la red dorsal y a la vez de una o más áreas.
+
+	\par El \textbf{enrutador de borde de sistema autónomo} (\textit{EBSA}) inyecta en el área rutas a destinos externos en otros AS. Las rutas externas aparecen como destinos que pueden ser alcanzados vía un EBSA con algún costo. Una ruta externa puede ser inyectada a uno o más EBSA.
+
+	\begin{center}
+			\includegraphics[width=9cm, height=5cm]{./imagenes/ospf2.png} 
+		\end{center}
+		
+	\par Los EBA resumen información de enrutamiento que han aprendido de un área y la hacen disponible en sus avisos de estado de enlace que envían a las otras áreas. Un EBA recibe mensajes de estado de enlace de todos los enrutadores de una de sus áreas A y entonces determina el costo de alcanzar cada red de A. Cuando un EBA envía avisos de estado de enlace a la red dorsal, avisa de los costos de alcanzar las redes del área A, como si estas redes estuvieran directamente conectadas al EBA, esto permite que todos los enrutadores del área dorsal aprendan el costo de alcanzar todas las redes del área A. Cuando un EBA envía avisos de estado de enlace a su red no dorsal, avisa de los costos a alcanzar todas las redes de las otras áreas (no dorsal). Luego todos los enrutadores aprenden a alcanzar todas las redes en el dominio.
+	
+	\par Cuando se ejecuta OSPF los enrutadores dentro de un área ejecutan el protocolo de estado de enlace, hay paquetes \textbf{Hello}. Los enrutadores dentro de un área intercambian mensajes de estado de enlace periódicamente usando inundación. Estos enrutadores también envían estos mensajes cuando una línea se cae, regresa o su costo cambia. Los mensajes de estado de enlace de enrutadores que no son EBA no dejan el área en el que se originan. Los enrutadores internos a un área no van a conocer detalles acerca de la topología de otras áreas.
+
+	\par Dentro de un área cada enrutador tiene la misma \textbf{base de datos de estado de enlace} (\textit{BDEE}) y ejecuta el mismo algoritmo de la ruta más corta. Su trabajo principal es calcular el camino más corto desde sí mismo a cualquier otro enrutador de su área y red en el AS entero. Un EBA necesita las bases de datos de estado de enlace para todas las áreas a las cuales está conectado y debe correr el algoritmo de Dijkstra para cada área separadamente.
+
 
 \subsection{BGP: el protocolo de enrutamiento de Puerta de Enlace Exterior}
 	\par Los enrutadores de protocolo de puerta de enlace exterior tienen que 
@@ -507,8 +943,6 @@ La esencia del problema consiste en que cuando X indica Xi a E, E no tiene forma
 	conectan entre sí como un punto único de compañerismo.
 
 
-
-
 \chapter{LA CAPA DE TRANSPORTE}
 \par Junto con la capa de red, la capa de transporte es el corazón de la jerarquía de 
 protocolos. La capa de red provee una entrega de paquetes punto a punto mediante 
@@ -544,6 +978,8 @@ usar y no debe exponer cuestiones internas (retransmisiones, fragmentación, etc
 	\end{center}
 
 \subsection{Primitivas del servicio de transporte}
+
+
 \par Para permitir que los usuarios accedan al servicio de transporte, la capa de 
 transporte debe proporcionar algunas operaciones a los programas de aplicación; es 
 decir, una interfaz del servicio de transporte.
@@ -581,8 +1017,6 @@ conexiónes:
 \begin{center}
 	\includegraphics[width=11cm, height=7cm]{./imagenes/diagrama.png} 
 \end{center}
-
-\subsection{Sockets de Berkeley}
 
 
 \section{Elementos de los protocolos de transporte}
@@ -658,6 +1092,53 @@ conectado a un determinado TSAP?
 \end{itemize} 
 
 \subsection{Establecimiento de una conexión}
+A primera vista parecería suficiente con que una entidad de transporte enviara tan 
+sólo un segmento CONNECTION REQUEST al destino y esperara una respuesta CONNECTION ACCEPTED. El problema ocurre cuando la red puede perder, retrasar, corromper y duplicar paquetes. Este comportamiento causa complicaciones serias.
+\par Imaginemos una subred de datagramas muy congestionada en la que las confirmaciones de recepción casi nunca regresan a tiempo, cada paquete expira y se retransmite algunas veces siguiendo rutas distintas. Algunos paquetes podrían atorarse en un congestionamiento de tráfico de la subred y tardar mucho tiempo en llegar.
+\par La peor pesadilla posible es la siguiente. Un usuario establece una conexión con un banco, envía mensajes indicando al banco que transfiera dinero a la cuenta de una persona y a continuación libera la conexión. Por mala fortuna cada paquete de la transacción se duplica y se almacena en la subred. Tras liberar la conexión todos los paquetes salen de la subred y llegan a destino en orden, solicitando al banco que abra una conexión nueva, transfiera dinero (nuevamente) y libere la conexión.
+\par El banco no tiene manera de saber que son duplicados; debe suponer que esta es una segunda transacción independiente, y transfiere nuevamente el dinero. Estudiaremos el problema de los duplicados retrasados estudiando algoritmos para establecer conexión de una manera confiable, de modo que situaciones como la anterior no puedan ocurrir.
+\par El problema se puede atacar de varias maneras, ninguna de las cuales es muy satisfactoria. Una es usar direcciones de \textbf{transporte desechables}. En este enfoque, cada vez que se requiere una dirección de transporte, se genera una nueva. Cuando una conexión es liberada, se descarta la dirección y no se vuelve a utilizar. Esta estrategia dificulta la conexión con un proceso.
+\par Otra posibilidad es dar a cada conexión un identificador único (es decir, un número de secuencia que se incremente con cada conexión establecida) elegido por la parte iniciadora y puesto en cada segmento, incluyendo el que solicita la conexión. Después de liberar cada conexión, cada entidad de transporte puede actualizar una tabla que liste conexiones obsoletas como pares (entidad de transporte de igual, identificador de conexión). Cada vez que entre una solicitud de conexión, se puede verificar con la tabla para saber si pertenece a una conexión previamente liberada.
+\par Por desgracia, este esquema tiene una falla básica: requiere que cada entidad de transporte mantenga una cierta cantidad de información histórica durante un tiempo indefinido. Esta historia debe persistir tanto en la máquina de origen como en la de destino. De lo contrario, si una máquina falla y pierde su memoria, ya no sabrá qué identificadores de conexión ya han utilizado sus iguales.
+\par Debemos idear un mecanismo para eliminar a los paquetes viejos que aún andan vagando por ahí. Con esta restricción, el problema se vuelve algo más manejable.
+El tiempo de vida de un paquete puede restringirse a un máximo conocido mediante el uso de una (o más) de las siguientes técnicas:
+
+	\begin{enumerate}
+		\item \textbf{Un diseño de red restringido:} se usa para evitar que los paquetes hagan ciclos, combinado con una manera de limitar el retardo por congestionamiento a través de la trayectoria más larga posible (ahora conocida).
+		\item \textbf{Colocar un contador de saltos en cada paquete:} se inicializa el contador de saltos con un valor apropiado y se lo decrementa cada vez que se reenvía el paquete. El protocolo de red descarta cualquier paquete cuyo contador de saltos llega a cero.
+		\item \textbf{Marcar el tiempo en cada paquete:} cada paquete lleva la hora en la que fue creado y los enrutadores se ponen de acuerdo en descartar cualquier paquete que haya rebasado cierto tiempo predeterminado. Se requiere que los relojes de los enrutadores estén sincronizados lo que no es una tarea fácil, a menos que se logre la sincronización externamente a la red.
+	\end{enumerate}
+
+\par Pero no solo los paquetes viejos deben eliminarse sino también sus ACK, ya que un ack viejo puede ser el causante de duplicados retrasados.
+\par Introduciremos \textit{T}, que es un múltiplo pequeño del tiempo de vida de paquete máximo verdadero. El múltiplo depende del protocolo y tiene el efecto de hacer más grande a \textit{T}. Si esperamos un tiempo \textit{T} tras el envío de un paquete, podemos estar seguros que todos los rastros suyos ya han desaparecido, y que ni el ni sus ack aparecerán repentinamente de la nada para complicar el asunto. Al limitar los tiempos de vida de los paquetes, es posible proponer una manera a prueba de errores de establecer conexiones seguras.
+
+\subsubsection{Método de Tomlinson}
+\par La base del método es que el origen etiquete los segmentos con números de secuencia que no se vayan a reutilizar durante \textit{T} segundos. El periodo \textit{T} y la tasa de paquetes por segundo determinan el tamaño de los números de secuencia. De esta manera, sólo un paquete con un número de secuencia específico puede estar pendiente en cualquier momento dado. Aún puede haber duplicados de este paquete, en cuyo caso el destino debe descartarlos.
+\par Sabiendo el tiempo de vida del paquete, el número de secuencia esperado y los números de secuencia de segmentos a confirmar se puede saber si un segmento que llega es duplicado o no. Si el paquete no expiró y su número de secuencia es menor que el número de secuencia esperado, entonces ya se lo recibió y confirmó, en cambio si su número de secuencia es el número de secuencia de uno de los segmentos a confirmar, entonces es duplicado.
+\par Para resolver el problema de una máquina que pierde toda la memoria acerca de su estado tras de una caída, Tomlinson propuso equipar cada host con un reloj. Los relojes de los distintos hosts no necesitan estar sincronizados. Se supone que cada reloj tiene la forma de un contador binario que se incrementa a sí mismo a intervalos uniformes. Además, la cantidad de bits del contador debe ser igual o mayor que la cantidad de bits en los números de secuencia. Por último, y lo más importante, se supone que el reloj continúa operando aunque el host falle.
+\par Cuando se establece una conexión, los \textit{k} bits de menor orden del reloj se usan como número de secuencia inicial de \textit{k} bits. Cada conexión comienza a numerar sus segmentos con un número de secuencia inicial diferente. El espacio de secuencia también debe ser lo bastante grande para que, para cuando los números de secuencia se reinicien, los segmentos antiguos con el mismo número de secuencia hayan desaparecido hace mucho tiempo. En la figura 6-10(a) se muestra esta relación lineal entre tiempo y números secuenciales iniciales.
+
+\begin{center} 
+	\includegraphics[width=8cm, height=6cm]{./imagenes/tomlinson.png} 
+\end{center}
+
+\par Una vez que ambas entidades de transporte han acordado un número de secuencia inicial, puede usarse cualquier protocolo para el control de flujo de datos. La curva inicial de números de secuencia (indicada por la línea gruesa de la figura anterior) no es realmente lineal, sino una escalera, ya que el reloj avanza en pasos discretos. Por sencillez ignoramos este detalle.
+
+\par Para mantener los números de secuencia fuera de la región prohibida, necesitamos tener cuidado con dos aspectos. Si un host envía muchos datos con demasiada rapidez en una conexión recién abierta, el número de secuencia actual contra la curva de tiempo puede subir en forma más pronunciada que el número de secuencia inicial contra la curva de tiempo, lo cual provoca que el número de secuencia entre a la región prohibida. Para evitar que esto ocurra, la tasa máxima de datos en cualquier conexión es de un segmento por cada pulso de reloj. La entidad de transporte debe esperar hasta que el reloj emita un pulso antes de abrir una nueva conexión después de un reinicio por falla, no sea que el mismo número se utilice dos veces.
+Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos milisegundos). Esto es suponiendo que la relación tiempo a número de secuencia inicial es la función identidad. La idea es mantener los números de segmento generados por debajo de la línea gruesa correspondiente a esa relación.
+
+\par Entrar a la región prohibida por la parte inferior al enviar con demasiada rapidez no es la única forma de meterse en problemas. De la figura 6-10(b) podemos ver que, a cualquier tasa de datos menor que la tasa de reloj, la curva de números de secuencia actuales utilizados vs el tiempo entrará en un momento dado a la región prohibida desde la izquierda, mientras los números de secuencia se reinician. Entre mayor sea la pendiente de los números de secuencia actuales, más se retardará este evento. Justo antes de enviar cada segmento, la entidad de transporte debe comprobar que no esté a punto de entrar en la región prohibida; de ser así debe retardar el segmento durante \textit{T} segundos o resincronizar los números de secuencia.
+
+\par El método basado en reloj resuelve el problema de no poder diferenciar los segmentos duplicados con retardo de los segmentos nuevos. Sin embargo, hay un inconveniente práctico en cuanto a su uso para establecer conexiones. Como por lo general no recordamos los números de secuencia de una conexión a otra en el destino, aún no tenemos forma de saber si un segmento CONNECTION REQUEST que contiene un número de secuencia inicial es un duplicado de una conexión reciente.
+
+\par Para resolver este problema específico, Tomlinson (1975) desarrolló el acuerdo de tres vías (\textit{threeway handshake}). Este protocolo de establecimiento implica que un igual verifique con el otro que la solicitud de conexión sea realmente actual. El procedimiento normal de establecimiento al iniciar el \textit{host 1} se muestra en la figura 6-11(a). El \textit{host 1} escoge un número de secuencia, \textit{x}, y envía al \textit{host 2} un segmento CONNECTION REQUEST que contiene ese número. El \textit{host 2} responde con un segmento ACK para confirmar la recepción de \textit{x} y anunciar su propio número de secuencia inicial, \textit{y}. Por último, el \textit{host 1} confirma la recepción del número de secuencia inicial seleccionado por el \textit{host 2} en el primer segmento de datos que envía.
+
+\begin{center} 
+	\includegraphics[width=8cm, height=6cm]{./imagenes/tomlinson2.png} 
+\end{center}
+
+\par En la figura 6-11(b), el primer segmento es un CONNECTION REQUEST duplicado con retardo de una conexión antigua. Este segmento llega al \textit{host 2} sin el conocimiento del \textit{host 1}. El \textit{host 2} reacciona a este segmento y envía al \textit{host 1} un segmento ACK, para solicitar en efecto la comprobación de que el \textit{host 1} haya tratado realmente de establecer una nueva conexión. Cuando el \textit{host 1} rechaza el intento del \textit{host 2} por establecer una conexión, el \textit{host 2} se da cuenta de que fue engañado por un duplicado con retardo y abandona la conexión. De esta manera, un duplicado con retardo no causa daño.
+\par El peor caso ocurre cuando en la subred deambulan tanto un segmento CONNECTION REQUEST con retardo como un ACK. Este caso se muestra en la figura 6-11(c). Como en el ejemplo anterior, el \textit{host 2} recibe un CONNECTION REQUEST con retardo y lo contesta. En este momento es imprescindible tener en cuenta que el \textit{host 2} ha propuesto usar y como número de secuencia inicial para el tráfico del \textit{host 2} al \textit{host 1}, sabiendo bien que no existen todavía segmentos que contengan el número de secuencia y ni confirmaciones de recepción de y. Cuando llega el segundo segmento con retardo al \textit{host 2}, el hecho de que se confirmó la recepción de z en lugar de y indica al \textit{host 2}2 que éste también es un duplicado antiguo. Lo importante que debemos tener en cuenta aquí es que no hay una combinación de segmentos antiguos que puedan provocar la falla del protocolo y permitan establecer una conexión accidental cuando nadie la quiere.
 
 \subsection{Liberación de una conexión}
 
@@ -874,6 +1355,16 @@ de \textit{Tamaño de ventana} de 0 es válido e indica que se han recibido los 
 hasta \textit{Número de confrmación de recepción}$-$1.
 
 \subsection{Establecimiento de una conexión TCP}
+
+\par En TCP las conexiones se establecen mediante el acuerdo de tres vías. Para establecer una conexión, el \textbf{servidor} espera en forma pasiva una conexión entrante mediante la ejecución de las primitivas LISTEN y ACCEPT en ese orden, ya sea que se especifique un origen determinado o a nadie en particular.
+
+\par Del otro lado el cliente ejecuta una primitiva CONNECT en la que especifica la dirección y el puerto con el que se desea conectar, el tamaño máximo de segmento TCP que está dispuesto a aceptar y de manera opcional algunos datos de usuario (por ejemplo, una contraseña). La primitiva CONNECT envía un segmento TCP con el bit SYN encendido y el bit ACK apagado, y espera una respuesta.
+
+\par Cuando este segmento llega al destino, la entidad TCP de ahí revisa si hay un proceso que haya ejecutado una primitiva LISTEN en el puerto que se indica en el campo Puerto de destino. Si no lo hay, envía una respuesta con el bit RST encendido para rechazar la conexión.
+
+\par Si algún proceso está escuchando en el puerto, ese proceso recibe el segmento TCP entrante y puede entonces aceptar o rechazar la conexión. Si la acepta, se devuelve un segmento de confirmación de recepción. La secuencia de segmentos TCP enviados en el caso normal se muestra en la figura 6-37(a). Observe que un segmento SYN consume 1 byte de espacio de secuencia, por lo que se puede reconocer sin ambigüedades.
+
+
 \subsection{Liberación de una conexión TCP}
 \subsection{Modelado de administración de conexiones TCP}
 \subsection{Ventana deslizante de TCP}
