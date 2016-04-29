@@ -1020,7 +1020,7 @@ conexiónes:
 
 
 \section{Elementos de los protocolos de transporte}
-\par El servicio de transporte se implementa mediante un \textbf{protocolo de 
+	\par El servicio de transporte se implementa mediante un \textbf{protocolo de 
 transporte} entre las dos entidades de transporte. En la capa de transporte se requiere 
 el direccionamiento explícito de los destinos, se requieren búferes y control de flujo.
 
@@ -1091,7 +1091,6 @@ conectado a un determinado TSAP?
 	esta 	información en su base de datos.
 \end{itemize} 
 
-%Lista
 \subsection{Establecimiento de una conexión}
 
 	\par A primera vista parecería suficiente con que una entidad de transporte enviara tan 
@@ -1155,8 +1154,6 @@ Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos mil
 
 		\par El peor caso ocurre cuando en la subred deambulan tanto un segmento CONNECTION REQUEST con retardo como un ACK. Este caso se muestra en el inciso (c) de la figura. Como en el ejemplo anterior, el \textit{host 2} recibe un CONNECTION REQUEST con retardo y lo contesta. En este momento es imprescindible tener en cuenta que el \textit{host 2} ha propuesto usar y como número de secuencia inicial para el tráfico del \textit{host 2} al \textit{host 1}, sabiendo bien que no existen todavía segmentos que contengan el número de secuencia y ni confirmaciones de recepción de y. Cuando llega el segundo segmento con retardo al \textit{host 2}, el hecho de que se confirmó la recepción de z en lugar de y indica al \textit{host 2} que éste también es un duplicado antiguo. Lo importante que debemos tener en cuenta aquí es que no hay una combinación de segmentos antiguos que puedan provocar la falla del protocolo y permitan establecer una conexión accidental cuando nadie la quiere.
 
-
-%Lista
 \subsection{Liberación de una conexión}
 
 	\par Cuando ya no se necesita una conexión, debe liberarse para desocupar espacio en las tablas de las dos entidades de transporte. Hay dos estilos para terminar una conexión: \textbf{liberación asimétrica} y \textbf{liberación simétrica}. La liberación asimétrica es la manera en que funciona el sistema telefónico: cuando una de las partes cuelga, se interrumpe la conexión. La liberación simétrica trata la conexión como dos conexiones unidireccionales distintas y requiere que cada una se libere por separado.
@@ -1175,7 +1172,6 @@ Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos mil
 
 	\par Por desgracia, este protocolo no siempre funciona. Hay un problema famoso que tiene que ver con ese asunto. Se conoce como el \textbf{problema de los dos ejércitos}.
 
-%Lista
 \subsubsection{Problema de los dos ejércitos}
 
 	\begin{center}
@@ -1230,13 +1226,94 @@ Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos mil
 \subsection{Asignación de ancho de banda deseable }
 \subsection{Regulación de la tasa de envío}
 \subsection{Cuestiones inalámbricas}
+
+
 \section{Los protocolos de transporte de internet: UDP}
+	\par Internet tiene dos protocolos principales en la capa de transporte, uno sin conexión y otro orientado a la conexión. Los protocolos se complementan entre sí. El protocolo sin conexión es UDP. Prácticamente no hace nada más que enviar paquetes entre aplicaciones, y deja que las aplicaciones construyan sus propios protocolos en la parte superior según sea necesario. El protocolo orientado a conexión es TCP. Hace casi todo. Realiza las conexiones y agrega confiabilidad mediante las retransmisiones, junto con el control de flujo y el control de congestión, todo en beneficio de las aplicaciones que lo utilizan.
+
 \subsection{Introducción a UDP}
 
-\subsection{Llamada a procedimiento remoto}
+	\par UDP llamado Protocolo de Datagrama de Usuario (\textbf{Use Datagram Protocol}) es un protocolo de transporte no orientado a la conexión. UDP proporciona una forma para que las aplicaciones envíen datagramas IP encapsulados sin tener que establecer una conexión.
+	
+	\par UDP transmite segmentos que consisten en un encabezado de 8 bytes seguido de la carga útil. En la figura 6-27 se muestra ese encabezado. Los dos puertos sirven para identificar los puntos terminales dentro de las máquinas de origen y destino. Cuando llega un paquete UDP, su carga útil se entrega al proceso que está conectado al puerto de destino. Este enlace ocurre cuando se utiliza la primitiva BIND o algo similar.
+	
+	\par El valor principal de contar con UDP en lugar de simplemente utilizar IP puro es la adición de los puertos de origen y destino. Sin los campos de puerto, la capa de transporte no sabría qué hacer con cada paquete entrante. Con ellos, entrega el segmento incrustado a la aplicación correcta.
+	
+	\begin{center}
+		\includegraphics[width=10cm, height=4cm]{./imagenes/udp.png} 
+	\end{center}
+	
+	\par El puerto de origen se necesita principalmente cuando hay que enviar una respuesta al origen. Al copiar el campo \textit{Puerto de origen} del segmento entrante en el campo \textit{Puerto de destino} del segmento que sale, el proceso que envía la respuesta puede especificar cuál proceso de la máquina emisora va a recibirlo.
+
+	\par El campo \textit{Longitud UDP} incluye el encabezado de 8 bytes y los datos, mientras que el campo \textit{Suma de verificación} es opcional y se almacena como 0 si no se calcula (un 0 calculado se almacena como 1s). Su desactivación no tiene sentido a menos que la calidad del servicio de los datos no importe (por ejemplo, en la voz digitalizada).
+	
+	\par UDP no realiza control de flujo, control de congestión o retransmisión cuando se recibe un segmento erróneo. Todo lo anterior le corresponde a los procesos de usuario. 
+	
+	\par UDP es especialmente útil es en las situaciones cliente-servidor. Con frecuencia, el cliente envía una solicitud corta al servidor y espera una respuesta corta. Si se pierde la solicitud o la respuesta, el cliente simplemente puede esperar a que expire su temporizador e intentar de nuevo. El código no sólo es simple, sino que se requieren menos mensajes (uno en cada dirección) en comparación con un protocolo que requiere una configuración inicial, como TCP.
+
+	\par Una aplicación que utiliza de esta manera a UDP es DNS (Domain Name System), un programa que necesita buscar la dirección IP de algún host puede enviar al servidor DNS un paquete UDP que contenga el nombre de dicho host. El servidor responde con un paquete UDP que contiene la dirección IP del host. No se necesita configuración por adelantado ni tampoco una liberación posterior. Sólo dos mensajes que viajan a través de la red.
+	
+\subsection{RPC: Llamada a procedimiento remoto}
+
+	\par Enviar un mensaje a un host remoto y obtener una respuesta es muy parecido a realizar la llamada a una función en un lenguaje de programación. Así las interacciones de solicitud-respuesta en las redes se asignan en forma de llamadas a procedimientos, de este modo las aplicaciones de red son mucho más fáciles de programar y de manejar.
+	
+	\par Cuando un proceso en la \textit{máquina 1} llama a otro procedimiento en la \textit{máquina 2}, el proceso invocador en \#1 se suspende y la ejecución del procedimiento invocado se lleva a cabo en la \textit{máquina 2}. Se puede transportar información del proceso invocador al proceso invocado en los parámetros, y se puede regresar información en el resultado del procedimiento. El paso de mensajes es transparente para el programador. Esta técnica se conoce como RPC (\textbf{Remote Procedure Call}).
+
+	\par El objetivo de RPC es hacer que una llamada a procedimiento remoto sea lo más parecida posible a una local. Para llamar a un procedimiento remoto, el programa cliente se debe enlazar con un pequeño procedimiento de biblioteca, llamado \textbf{stub del cliente}, que representa al procedimiento servidor en el espacio de direcciones del cliente. Asimismo, el servidor se enlaza con una llamada a procedimiento denominada \textbf{stub del servidor}. Estos procedimientos ocultan el hecho de que la llamada a procedimiento del cliente al servidor no es local. En la figura 6-29 se muestran los pasos reales para realizar una RPC.
+	
+	\begin{center}
+		\includegraphics[width=10cm, height=4cm]{./imagenes/rpc.png} 
+	\end{center}
+	
+	\begin{enumerate}
+		\item El cliente llama al \textbf{stub del cliente}. Ésta es una llamada a procedimiento local, y los parámetros se meten en la pila de la forma tradicional.
+		\item El \textbf{stub del cliente} empaca los parámetros en un mensaje y realiza una llamada de sistema para enviar el mensaje, a este proceso se lo conoce como \textit{marshaling} (empaquetar).
+		\item El sistema operativo envía el mensaje de la máquina cliente a la máquina servidor.
+		\item El sistema operativo pasa el paquete entrante al \textbf{stub del servidor}. 
+		\item El \textbf{stub del servidor} llama al procedimiento servidor con los parámetros sin empacar (\textit{unmarshaling}).
+		\item La respuesta sigue la misma ruta en la dirección opuesta.
+	\end{enumerate}
+	
+	\par El procedimiento cliente realiza una llamada a procedimiento normal local al \textbf{stub del cliente} la cual tiene el mismo nombre que el procedimiento en el servidor.
+	
+	\par A pesar de la elegancia conceptual de RPC, hay alguna desventajas ocultas. Con RPC el paso de punteros es imposible ya que el cliente y el servidor están en diferentes espacios de direcciones. Por lo general los procedimientos invocador e invocado pueden comunicarse por el uso de variables globales y parámetros. Si el procedimiento invocado se mueve a una máquina remota, el código fallará porque las variables globales ya no se pueden compartir.
+
+
+	\par RPC y UDP son una buena combinación y RPC se usa comúnmente con UDP.  Cuando los parámetros o resultados sean más grandes que el tamaño máximo del paquete UDP, tal vez sea necesario establecer una conexión TCP y enviar una solicitud a través de ella.
+
 \subsection{Protocolos de transporte en tiempo real}
 
+	\par UDP también se utiliza en aplicaciónes de tiempo real como la radio en Internet, la telefonía en Internet, la música bajo demanda, las videoconferencias, el video bajo demanda y otras aplicaciones multimedia se volvían más comunes, las personas descubrieron que cada una de esas aplicaciones estaba reinventando más o menos el mismo protocolo de transporte de tiempo-real. Cada vez era más claro que tener un protocolo genérico de transporte en tiempo real para múltiples aplicaciones sería una excelente idea.
 
+	\par A raíz de esto fue que nació el RTP (\textbf{Real-time Transport Protocol}), utilizado ampliamente para aplicaciones multimedia. RTP se ejecuta en espacio de usuario sobre UDP (en el sistema operativo). La aplicación multimedia consiste en múltiples flujos de audio, video, texto y quizás otros flujos. Éstos se colocan en la biblioteca RTP, la cual está en el espacio de usuario junto con la aplicación. Esta biblioteca multiplexa los flujos y los codifica en paquetes RTP, que después coloca en un socket. En el extremo del socket correspondiente al sistema operativo, se generan paquetes UDP para envolver los paquetes RTP y se entregan al IP para que los transmita a través de un enlace tal como Ethernet. En la figura 6-30(a) se muestra la pila de protocolos para esta situación. En la figura 6-30(b) se muestra el anidamiento de paquetes.
+	
+	\begin{center}
+		\includegraphics[width=11cm, height=7cm]{./imagenes/tiemporeal.png} 
+	\end{center}
+
+\subsubsection{RTP: Protocolo de Transporte en Tiempo Real}
+
+	\par La función de RTP es multiplexar varios flujos de datos de tiempo real en un solo flujo de paquetes UDP. El flujo UDP se puede enviar a un solo destino (\textbf{unidifusión}) o a múltiples destinos (\textbf{multidifusión}). No hay garantías especiales acerca de la entrega, así que los paquetes se pueden perder, retrasar, corromper, etc.
+		
+	\par A cada paquete enviado en un flujo RTP se le da un número más grande que a su predecesor. Esta numeración permite al destino determinar si falta algún paquete en cuyo caso, la mejor acción a realizar queda a criterio de la aplicación. Tal vez esta acción sea omitir una trama de video si los paquetes transportan datos de video, o aproximar el valor faltante mediante la interpolación en caso de que los paquetes transporten datos de audio. La retransmisión no es una opción práctica debido a la probabilidad de que el paquete retransmitido llegue muy tarde como para ser útil por lo que RTP no tiene confirmaciones de recepción ni ningún mecanismo para solicitar retransmisiones.
+
+	\par Las estampas de tiempo (\textit{timestamping}) son otra herramienta que muchas de las aplicaciones en tiempo real necesitan. La idea aquí es permitir que la fuente asocie una estampa de tiempo con la primera muestra de cada paquete. Las estampas de tiempo son relativas al inicio del flujo, por lo que sólo son importantes las diferencias entre dichas estampas. Como veremos en breve, este mecanismo permite que el destino haga un uso muy moderado del almacenamiento en búfer y reproduzca cada muestra el número exacto de milisegundos después del inicio del flujo, sin importar cuándo llegó el paquete que contiene la muestra.
+	
+	\par En la figura 6-31 se ilustra el encabezado RTP, que consiste de tres palabras de 32 bits y potencialmente de algunas extensiones. La primera palabra contiene el campo \textit{Versión}, que es la 2.
+
+	\par El \textit{bit P} indica que el paquete se ha rellenado para formar un múltiplo de 4 bytes. El último byte de relleno indica cuántos bytes se agregaron. El \textit{bit X} indica que hay un encabezado de extensión. El formato y el significado de este encabezado no se definen. Lo único que se define es que la primera palabra de la extensión proporciona la longitud. Ésta es una puerta de escape para cualquier requerimiento imprevisto.
+
+	\begin{center}
+		\includegraphics[width=11cm, height=7cm]{./imagenes/tiemporeal.png} 
+	\end{center}
+
+	\par El campo CC indica cuántas fuentes de contribución están presentes, de 0 a 15 (vea abajo). El bit M es un bit marcador específico de la aplicación. Puede utilizarse para marcar el inicio de una trama de video, el inicio de una palabra en un canal de audio o algo más que la aplicación entienda. El campo Tipo de car- ga útil indica cuál algoritmo de codificación se utilizó (por ejemplo, audio de 8 bits sin compresión, MP3, etc.). Puesto que cada paquete lleva este campo, la codificación puede cambiar durante la transmisión. El Número de secuencia es simplemente un contador que se incrementa con cada paquete RTP enviado. Se utiliza para detectar paquetes perdidos.
+	
+	
+	
+	
+	
+%FALTA control de congestion
 \section{Los protocolos de transporte de internet: TCP}
 
 \subsection{Introducción a TCP}
@@ -1532,6 +1609,7 @@ RTO, se establece así:
 	\par Un tercer temporizador que utilizan algunas implementaciones es el \textbf{temporizador de seguir con vida} (\textit{keepalive}). Cuando una conexión ha estado inactiva durante demasiado tiempo, el temporizador de seguir con vida puede expirar para ocasionar que un lado compruebe que el otro aún está ahí. Si no se recibe respuesta, se termina la conexión. Esta característica es controversial puesto que agrega sobrecarga y puede terminar una conexión saludable debido a una partición temporal de la red.
 
 \subsection{Control de congestión en TCP}
+
 
 
 \begin{thebibliography}{X}
