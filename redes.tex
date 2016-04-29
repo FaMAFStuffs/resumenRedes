@@ -1091,16 +1091,25 @@ conectado a un determinado TSAP?
 	esta 	información en su base de datos.
 \end{itemize} 
 
+%Lista
 \subsection{Establecimiento de una conexión}
-A primera vista parecería suficiente con que una entidad de transporte enviara tan 
+
+	\par A primera vista parecería suficiente con que una entidad de transporte enviara tan 
 sólo un segmento CONNECTION REQUEST al destino y esperara una respuesta CONNECTION ACCEPTED. El problema ocurre cuando la red puede perder, retrasar, corromper y duplicar paquetes. Este comportamiento causa complicaciones serias.
-\par Imaginemos una subred de datagramas muy congestionada en la que las confirmaciones de recepción casi nunca regresan a tiempo, cada paquete expira y se retransmite algunas veces siguiendo rutas distintas. Algunos paquetes podrían atorarse en un congestionamiento de tráfico de la subred y tardar mucho tiempo en llegar.
-\par La peor pesadilla posible es la siguiente. Un usuario establece una conexión con un banco, envía mensajes indicando al banco que transfiera dinero a la cuenta de una persona y a continuación libera la conexión. Por mala fortuna cada paquete de la transacción se duplica y se almacena en la subred. Tras liberar la conexión todos los paquetes salen de la subred y llegan a destino en orden, solicitando al banco que abra una conexión nueva, transfiera dinero (nuevamente) y libere la conexión.
-\par El banco no tiene manera de saber que son duplicados; debe suponer que esta es una segunda transacción independiente, y transfiere nuevamente el dinero. Estudiaremos el problema de los duplicados retrasados estudiando algoritmos para establecer conexión de una manera confiable, de modo que situaciones como la anterior no puedan ocurrir.
-\par El problema se puede atacar de varias maneras, ninguna de las cuales es muy satisfactoria. Una es usar direcciones de \textbf{transporte desechables}. En este enfoque, cada vez que se requiere una dirección de transporte, se genera una nueva. Cuando una conexión es liberada, se descarta la dirección y no se vuelve a utilizar. Esta estrategia dificulta la conexión con un proceso.
-\par Otra posibilidad es dar a cada conexión un identificador único (es decir, un número de secuencia que se incremente con cada conexión establecida) elegido por la parte iniciadora y puesto en cada segmento, incluyendo el que solicita la conexión. Después de liberar cada conexión, cada entidad de transporte puede actualizar una tabla que liste conexiones obsoletas como pares (entidad de transporte de igual, identificador de conexión). Cada vez que entre una solicitud de conexión, se puede verificar con la tabla para saber si pertenece a una conexión previamente liberada.
-\par Por desgracia, este esquema tiene una falla básica: requiere que cada entidad de transporte mantenga una cierta cantidad de información histórica durante un tiempo indefinido. Esta historia debe persistir tanto en la máquina de origen como en la de destino. De lo contrario, si una máquina falla y pierde su memoria, ya no sabrá qué identificadores de conexión ya han utilizado sus iguales.
-\par Debemos idear un mecanismo para eliminar a los paquetes viejos que aún andan vagando por ahí. Con esta restricción, el problema se vuelve algo más manejable.
+
+	\par Imaginemos una subred de datagramas muy congestionada en la que las confirmaciones de recepción casi nunca regresan a tiempo, cada paquete expira y se retransmite algunas veces siguiendo rutas distintas. Algunos paquetes podrían atorarse en un congestionamiento de tráfico de la subred y tardar mucho tiempo en llegar.
+
+	\par La peor pesadilla posible es la siguiente. Un usuario establece una conexión con un banco, envía mensajes indicando al banco que transfiera dinero a la cuenta de una persona y a continuación libera la conexión. Por mala fortuna cada paquete de la transacción se duplica y se almacena en la subred. Tras liberar la conexión todos los paquetes salen de la subred y llegan a destino en orden, solicitando al banco que abra una conexión nueva, transfiera dinero (nuevamente) y libere la conexión.
+
+	\par El banco no tiene manera de saber que son duplicados; debe suponer que esta es una segunda transacción independiente, y transfiere nuevamente el dinero. Estudiaremos el problema de los duplicados retrasados estudiando algoritmos para establecer conexión de una manera confiable, de modo que situaciones como la anterior no puedan ocurrir.
+
+	\par El problema se puede atacar de varias maneras, ninguna de las cuales es muy satisfactoria. Una es usar direcciones de \textbf{transporte desechables}. En este enfoque, cada vez que se requiere una dirección de transporte, se genera una nueva. Cuando una conexión es liberada, se descarta la dirección y no se vuelve a utilizar. Esta estrategia dificulta la conexión con un proceso.
+
+	\par Otra posibilidad es dar a cada conexión un identificador único (es decir, un número de secuencia que se incremente con cada conexión establecida) elegido por la parte iniciadora y puesto en cada segmento, incluyendo el que solicita la conexión. Después de liberar cada conexión, cada entidad de transporte puede actualizar una tabla que liste conexiones obsoletas como pares (entidad de transporte de igual, identificador de conexión). Cada vez que entre una solicitud de conexión, se puede verificar con la tabla para saber si pertenece a una conexión previamente liberada.
+
+	\par Por desgracia, este esquema tiene una falla básica: requiere que cada entidad de transporte mantenga una cierta cantidad de información histórica durante un tiempo indefinido. Esta historia debe persistir tanto en la máquina de origen como en la de destino. De lo contrario, si una máquina falla y pierde su memoria, ya no sabrá qué identificadores de conexión ya han utilizado sus iguales.
+
+	\par Debemos idear un mecanismo para eliminar a los paquetes viejos que aún andan vagando por ahí. Con esta restricción, el problema se vuelve algo más manejable.
 El tiempo de vida de un paquete puede restringirse a un máximo conocido mediante el uso de una (o más) de las siguientes técnicas:
 
 	\begin{enumerate}
@@ -1109,48 +1118,121 @@ El tiempo de vida de un paquete puede restringirse a un máximo conocido mediant
 		\item \textbf{Marcar el tiempo en cada paquete:} cada paquete lleva la hora en la que fue creado y los enrutadores se ponen de acuerdo en descartar cualquier paquete que haya rebasado cierto tiempo predeterminado. Se requiere que los relojes de los enrutadores estén sincronizados lo que no es una tarea fácil, a menos que se logre la sincronización externamente a la red.
 	\end{enumerate}
 
-\par Pero no solo los paquetes viejos deben eliminarse sino también sus ACK, ya que un ack viejo puede ser el causante de duplicados retrasados.
-\par Introduciremos \textit{T}, que es un múltiplo pequeño del tiempo de vida de paquete máximo verdadero. El múltiplo depende del protocolo y tiene el efecto de hacer más grande a \textit{T}. Si esperamos un tiempo \textit{T} tras el envío de un paquete, podemos estar seguros que todos los rastros suyos ya han desaparecido, y que ni el ni sus ack aparecerán repentinamente de la nada para complicar el asunto. Al limitar los tiempos de vida de los paquetes, es posible proponer una manera a prueba de errores de establecer conexiones seguras.
+	\par Pero no solo los paquetes viejos deben eliminarse sino también sus ACK, ya que un ack viejo puede ser el causante de duplicados retrasados.
 
-\subsubsection{Método de Tomlinson}
-\par La base del método es que el origen etiquete los segmentos con números de secuencia que no se vayan a reutilizar durante \textit{T} segundos. El periodo \textit{T} y la tasa de paquetes por segundo determinan el tamaño de los números de secuencia. De esta manera, sólo un paquete con un número de secuencia específico puede estar pendiente en cualquier momento dado. Aún puede haber duplicados de este paquete, en cuyo caso el destino debe descartarlos.
-\par Sabiendo el tiempo de vida del paquete, el número de secuencia esperado y los números de secuencia de segmentos a confirmar se puede saber si un segmento que llega es duplicado o no. Si el paquete no expiró y su número de secuencia es menor que el número de secuencia esperado, entonces ya se lo recibió y confirmó, en cambio si su número de secuencia es el número de secuencia de uno de los segmentos a confirmar, entonces es duplicado.
-\par Para resolver el problema de una máquina que pierde toda la memoria acerca de su estado tras de una caída, Tomlinson propuso equipar cada host con un reloj. Los relojes de los distintos hosts no necesitan estar sincronizados. Se supone que cada reloj tiene la forma de un contador binario que se incrementa a sí mismo a intervalos uniformes. Además, la cantidad de bits del contador debe ser igual o mayor que la cantidad de bits en los números de secuencia. Por último, y lo más importante, se supone que el reloj continúa operando aunque el host falle.
-\par Cuando se establece una conexión, los \textit{k} bits de menor orden del reloj se usan como número de secuencia inicial de \textit{k} bits. Cada conexión comienza a numerar sus segmentos con un número de secuencia inicial diferente. El espacio de secuencia también debe ser lo bastante grande para que, para cuando los números de secuencia se reinicien, los segmentos antiguos con el mismo número de secuencia hayan desaparecido hace mucho tiempo. En la figura 6-10(a) se muestra esta relación lineal entre tiempo y números secuenciales iniciales.
+	\par Introduciremos \textit{T}, que es un múltiplo pequeño del tiempo de vida de paquete máximo verdadero. El múltiplo depende del protocolo y tiene el efecto de hacer más grande a \textit{T}. Si esperamos un tiempo \textit{T} tras el envío de un paquete, podemos estar seguros que todos los rastros suyos ya han desaparecido, y que ni el ni sus ack aparecerán repentinamente de la nada para complicar el asunto. Al limitar los tiempos de vida de los paquetes, es posible proponer una manera a prueba de errores de establecer conexiones seguras.
 
-\begin{center} 
-	\includegraphics[width=8cm, height=6cm]{./imagenes/tomlinson.png} 
-\end{center}
+	\subsubsection{Método de Tomlinson}
 
-\par Una vez que ambas entidades de transporte han acordado un número de secuencia inicial, puede usarse cualquier protocolo para el control de flujo de datos. La curva inicial de números de secuencia (indicada por la línea gruesa de la figura anterior) no es realmente lineal, sino una escalera, ya que el reloj avanza en pasos discretos. Por sencillez ignoramos este detalle.
+		\par La base del método es que el origen etiquete los segmentos con números de secuencia que no se vayan a reutilizar durante \textit{T} segundos. El periodo \textit{T} y la tasa de paquetes por segundo determinan el tamaño de los números de secuencia. De esta manera, sólo un paquete con un número de secuencia específico puede estar pendiente en cualquier momento dado. Aún puede haber duplicados de este paquete, en cuyo caso el destino debe descartarlos.
 
-\par Para mantener los números de secuencia fuera de la región prohibida, necesitamos tener cuidado con dos aspectos. Si un host envía muchos datos con demasiada rapidez en una conexión recién abierta, el número de secuencia actual contra la curva de tiempo puede subir en forma más pronunciada que el número de secuencia inicial contra la curva de tiempo, lo cual provoca que el número de secuencia entre a la región prohibida. Para evitar que esto ocurra, la tasa máxima de datos en cualquier conexión es de un segmento por cada pulso de reloj. La entidad de transporte debe esperar hasta que el reloj emita un pulso antes de abrir una nueva conexión después de un reinicio por falla, no sea que el mismo número se utilice dos veces.
+		\par Sabiendo el tiempo de vida del paquete, el número de secuencia esperado y los números de secuencia de segmentos a confirmar se puede saber si un segmento que llega es duplicado o no. Si el paquete no expiró y su número de secuencia es menor que el número de secuencia esperado, entonces ya se lo recibió y confirmó, en cambio si su número de secuencia es el número de secuencia de uno de los segmentos a confirmar, entonces es duplicado.
+
+		\par Para resolver el problema de una máquina que pierde toda la memoria acerca de su estado tras de una caída, Tomlinson propuso equipar cada host con un reloj. Los relojes de los distintos hosts no necesitan estar sincronizados. Se supone que cada reloj tiene la forma de un contador binario que se incrementa a sí mismo a intervalos uniformes. Además, la cantidad de bits del contador debe ser igual o mayor que la cantidad de bits en los números de secuencia. Por último, y lo más importante, se supone que el reloj continúa operando aunque el host falle.
+
+		\par Cuando se establece una conexión, los \textit{k} bits de menor orden del reloj se usan como número de secuencia inicial de \textit{k} bits. Cada conexión comienza a numerar sus segmentos con un número de secuencia inicial diferente. El espacio de secuencia también debe ser lo bastante grande para que cuando los números de secuencia se reinicien, los segmentos antiguos con el mismo número de secuencia hayan desaparecido hace mucho tiempo. En la figura 6-10(a) se muestra esta relación lineal entre tiempo y números secuenciales iniciales.
+
+		\begin{center} 
+			\includegraphics[width=9cm, height=6cm]{./imagenes/tomlinson.png} 
+		\end{center}
+
+		\par Una vez que ambas entidades de transporte han acordado un número de secuencia inicial, puede usarse cualquier protocolo para el control de flujo de datos. La curva inicial de números de secuencia (indicada por la línea gruesa de la figura anterior) no es realmente lineal, sino una escalera, ya que el reloj avanza en pasos discretos. Por sencillez ignoramos este detalle.
+
+		\par Para mantener los números de secuencia fuera de la región prohibida, necesitamos tener cuidado con dos aspectos. Si un host envía muchos datos con demasiada rapidez en una conexión recién abierta, el número de secuencia actual contra la curva de tiempo puede subir en forma más pronunciada que el número de secuencia inicial contra la curva de tiempo, lo cual provoca que el número de secuencia entre a la región prohibida. Para evitar que esto ocurra, la tasa máxima de datos en cualquier conexión es de un segmento por cada pulso de reloj. La entidad de transporte debe esperar hasta que el reloj emita un pulso antes de abrir una nueva conexión después de un reinicio por falla, no sea que el mismo número se utilice dos veces.
 Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos milisegundos). Esto es suponiendo que la relación tiempo a número de secuencia inicial es la función identidad. La idea es mantener los números de segmento generados por debajo de la línea gruesa correspondiente a esa relación.
 
-\par Entrar a la región prohibida por la parte inferior al enviar con demasiada rapidez no es la única forma de meterse en problemas. De la figura 6-10(b) podemos ver que, a cualquier tasa de datos menor que la tasa de reloj, la curva de números de secuencia actuales utilizados vs el tiempo entrará en un momento dado a la región prohibida desde la izquierda, mientras los números de secuencia se reinician. Entre mayor sea la pendiente de los números de secuencia actuales, más se retardará este evento. Justo antes de enviar cada segmento, la entidad de transporte debe comprobar que no esté a punto de entrar en la región prohibida; de ser así debe retardar el segmento durante \textit{T} segundos o resincronizar los números de secuencia.
+		\par Entrar a la región prohibida por la parte inferior al enviar con demasiada rapidez no es la única forma de meterse en problemas. De la figura 6-10(b) podemos ver que, a cualquier tasa de datos menor que la tasa de reloj, la curva de números de secuencia actuales utilizados vs el tiempo entrará en un momento dado a la región prohibida desde la izquierda, mientras los números de secuencia se reinician. Entre mayor sea la pendiente de los números de secuencia actuales, más se retardará este evento. Justo antes de enviar cada segmento, la entidad de transporte debe comprobar que no esté a punto de entrar en la región prohibida; de ser así debe retardar el segmento durante \textit{T} segundos o resincronizar los números de secuencia.
 
-\par El método basado en reloj resuelve el problema de no poder diferenciar los segmentos duplicados con retardo de los segmentos nuevos. Sin embargo, hay un inconveniente práctico en cuanto a su uso para establecer conexiones. Como por lo general no recordamos los números de secuencia de una conexión a otra en el destino, aún no tenemos forma de saber si un segmento CONNECTION REQUEST que contiene un número de secuencia inicial es un duplicado de una conexión reciente.
+		\par El método basado en reloj resuelve el problema de no poder diferenciar los segmentos duplicados con retardo de los segmentos nuevos. Sin embargo, hay un inconveniente práctico en cuanto a su uso para establecer conexiones. Como por lo general no recordamos los números de secuencia de una conexión a otra en el destino, aún no tenemos forma de saber si un segmento CONNECTION REQUEST que contiene un número de secuencia inicial es un duplicado de una conexión reciente.
 
-\par Para resolver este problema específico, Tomlinson (1975) desarrolló el acuerdo de tres vías (\textit{threeway handshake}). Este protocolo de establecimiento implica que un igual verifique con el otro que la solicitud de conexión sea realmente actual. El procedimiento normal de establecimiento al iniciar el \textit{host 1} se muestra en la figura 6-11(a). El \textit{host 1} escoge un número de secuencia, \textit{x}, y envía al \textit{host 2} un segmento CONNECTION REQUEST que contiene ese número. El \textit{host 2} responde con un segmento ACK para confirmar la recepción de \textit{x} y anunciar su propio número de secuencia inicial, \textit{y}. Por último, el \textit{host 1} confirma la recepción del número de secuencia inicial seleccionado por el \textit{host 2} en el primer segmento de datos que envía.
+		\par Para resolver este problema específico, Tomlinson (1975) desarrolló el \textbf{acuerdo de tres vías} (\textit{threeway handshake}). Este protocolo de establecimiento implica que un igual verifique con el otro que la solicitud de conexión sea realmente actual. El procedimiento normal de establecimiento al iniciar el \textit{host 1} se muestra en la figura siguiente figura, en su inciso (a). El \textit{host 1} escoge un número de secuencia, \textit{x}, y envía al \textit{host 2} un segmento CONNECTION REQUEST que contiene ese número. El \textit{host 2} responde con un segmento ACK para confirmar la recepción de \textit{x} y anunciar su propio número de secuencia inicial, \textit{y}. Por último, el \textit{host 1} confirma la recepción del número de secuencia inicial seleccionado por el \textit{host 2} en el primer segmento de datos que envía.
 
-\begin{center} 
-	\includegraphics[width=8cm, height=6cm]{./imagenes/tomlinson2.png} 
-\end{center}
+		\begin{center} 
+			\includegraphics[width=8cm, height=6cm]{./imagenes/tomlinson2.png} 
+		\end{center}
 
-\par En la figura 6-11(b), el primer segmento es un CONNECTION REQUEST duplicado con retardo de una conexión antigua. Este segmento llega al \textit{host 2} sin el conocimiento del \textit{host 1}. El \textit{host 2} reacciona a este segmento y envía al \textit{host 1} un segmento ACK, para solicitar en efecto la comprobación de que el \textit{host 1} haya tratado realmente de establecer una nueva conexión. Cuando el \textit{host 1} rechaza el intento del \textit{host 2} por establecer una conexión, el \textit{host 2} se da cuenta de que fue engañado por un duplicado con retardo y abandona la conexión. De esta manera, un duplicado con retardo no causa daño.
-\par El peor caso ocurre cuando en la subred deambulan tanto un segmento CONNECTION REQUEST con retardo como un ACK. Este caso se muestra en la figura 6-11(c). Como en el ejemplo anterior, el \textit{host 2} recibe un CONNECTION REQUEST con retardo y lo contesta. En este momento es imprescindible tener en cuenta que el \textit{host 2} ha propuesto usar y como número de secuencia inicial para el tráfico del \textit{host 2} al \textit{host 1}, sabiendo bien que no existen todavía segmentos que contengan el número de secuencia y ni confirmaciones de recepción de y. Cuando llega el segundo segmento con retardo al \textit{host 2}, el hecho de que se confirmó la recepción de z en lugar de y indica al \textit{host 2}2 que éste también es un duplicado antiguo. Lo importante que debemos tener en cuenta aquí es que no hay una combinación de segmentos antiguos que puedan provocar la falla del protocolo y permitan establecer una conexión accidental cuando nadie la quiere.
+		\par En la parte (b) de la figura, el primer segmento es un CONNECTION REQUEST duplicado con retardo de una conexión antigua. Este segmento llega al \textit{host 2} sin el conocimiento del \textit{host 1}. El \textit{host 2} reacciona a este segmento y envía al \textit{host 1} un segmento ACK, para solicitar en efecto la comprobación de que el \textit{host 1} haya tratado realmente de establecer una nueva conexión. Cuando el \textit{host 1} rechaza el intento del \textit{host 2} por establecer una conexión, el \textit{host 2} se da cuenta de que fue engañado por un duplicado con retardo y abandona la conexión. De esta manera, un duplicado con retardo no causa daño.
 
+		\par El peor caso ocurre cuando en la subred deambulan tanto un segmento CONNECTION REQUEST con retardo como un ACK. Este caso se muestra en el inciso (c) de la figura. Como en el ejemplo anterior, el \textit{host 2} recibe un CONNECTION REQUEST con retardo y lo contesta. En este momento es imprescindible tener en cuenta que el \textit{host 2} ha propuesto usar y como número de secuencia inicial para el tráfico del \textit{host 2} al \textit{host 1}, sabiendo bien que no existen todavía segmentos que contengan el número de secuencia y ni confirmaciones de recepción de y. Cuando llega el segundo segmento con retardo al \textit{host 2}, el hecho de que se confirmó la recepción de z en lugar de y indica al \textit{host 2} que éste también es un duplicado antiguo. Lo importante que debemos tener en cuenta aquí es que no hay una combinación de segmentos antiguos que puedan provocar la falla del protocolo y permitan establecer una conexión accidental cuando nadie la quiere.
+
+
+%Lista
 \subsection{Liberación de una conexión}
 
+	\par Cuando ya no se necesita una conexión, debe liberarse para desocupar espacio en las tablas de las dos entidades de transporte. Hay dos estilos para terminar una conexión: \textbf{liberación asimétrica} y \textbf{liberación simétrica}. La liberación asimétrica es la manera en que funciona el sistema telefónico: cuando una de las partes cuelga, se interrumpe la conexión. La liberación simétrica trata la conexión como dos conexiones unidireccionales distintas y requiere que cada una se libere por separado.
+
+	\par La liberación asimétrica es abrupta y puede provocar la pérdida de datos. Considere el escenario de la figura siguiente.
+	
+	\begin{center}
+		\includegraphics[width=7cm, height=5cm]{./imagenes/liberacion.png}
+	\end{center}
+	
+	\par Una vez que se establece la conexión, el \textit{host 1} envía un segmento que llega en forma apropiada al \textit{host 2}. A continuación, el \textit{host 1} envía otro segmento. Por desgracia, el \textit{host 2} emite un DISCONNECT antes de que llegue el segundo segmento. El resultado es que se libera la conexión y se pierden los datos.
+
+	\par Se requiere un protocolo de liberación más sofisticado para evitar la pérdida de los datos. Una posibilidad es usar la liberación simétrica, en la que cada dirección se libera en forma independiente de la otra. Aquí, un host puede continuar recibiendo datos, aun después de haber enviado un segmento DISCONNECT.
+
+	\par La liberación simétrica es ideal cuando cada proceso tiene una cantidad fija de datos por enviar y sabe con certeza cuándo los ha enviado. En otras situaciones, el proceso de determinar si se ha efectuado o no todo el trabajo y si debe terminar o no la conexión no es tan obvio. Podríamos pensar en un protocolo en el que el \textit{host 1} diga: “Ya terminé. ¿Terminaste también?” Si el \textit{host 2} responde: “Ya terminé también. Adiós”, la conexión se puede liberar sin problemas.
+
+	\par Por desgracia, este protocolo no siempre funciona. Hay un problema famoso que tiene que ver con ese asunto. Se conoce como el \textbf{problema de los dos ejércitos}.
+
+%Lista
+\subsubsection{Problema de los dos ejércitos}
+
+	\begin{center}
+		\includegraphics[width=9cm, height=6cm]{./imagenes/ejercitos.png}
+	\end{center}
+
+	\par Imagine que un ejército blanco está acampado en un valle, como se muestra en la figura 6-13. En los dos cerros que rodean al valle hay ejércitos azules. El ejército blanco es más grande que cualquiera de los dos ejércitos azules por separado, pero juntos éstos son más grandes que el ejército blanco. Si cualquiera de los dos ejércitos azules ataca por su cuenta, será derrotado, pero si los dos atacan a la vez obtendrán la victoria.
+
+	\par Los ejércitos azules quieren sincronizar sus ataques. Sin embargo, su único medio de comunicación es el envío de mensajeros a pie a través del valle, donde podrían ser capturados y se perdería el mensaje (es decir, tienen que usar un canal de comunicación no confiable). La pregunta es: ¿Existe un protocolo que permita que los ejércitos azules ganen?
+	
+	\par Supongamos que el comandante del \textit{ejército azul \#1} envía un mensaje que dice: “Propongo que ataquemos en el horario H. ¿Qué les parece?” Ahora supongamos que llega el mensaje y que el comandante del \textit{ejército azul \#2} está de acuerdo, y que su respuesta llega con seguridad al \textit{ejército azul \#1}. ¿Ocurrirá el ataque? Es probable que no, porque el comandante \#2 no sabe si su respuesta llegó. Si no llegó, el \textit{ejército azul \#1} no atacará, y sería tonto de su parte emprender el combate.
+	
+	\par Mejoremos ahora el protocolo para convertirlo en un \textbf{acuerdo de tres vías}. El iniciador de la propuesta original debe confirmar la recepción de la respuesta. Suponiendo que no se pierden mensajes, el \textit{ejército azul \#2} recibirá la confirmación de recepción, pero ahora el que dudará será el comandante del \textit{ejército azul \#1}. A fin de cuentas, no sabe si ha llegado su confirmación de recepción y, si no llegó, sabe que el \textit{ejército \#2} no atacará. Podríamos probar ahora un protocolo de acuerdo de cuatro vías, pero tampoco ayudaría.
+	
+	\par Podemos demostrar que no existe un protocolo que funcione. Supongamos que existiera algún protocolo. El último mensaje del protocolo es esencial, o no lo es. Si no lo es, podemos eliminarlo (así como los demás mensajes no esenciales) hasta que quede un protocolo en el que todos los mensajes sean esenciales. ¿Qué ocurre si el mensaje final no pasa? Acabamos de decir que es esencial, por lo que, si se pierde, el ataque no ocurrirá. Dado que el emisor del mensaje final nunca puede estar seguro de su llegada, no se arriesgará a atacar. Peor aún, el otro ejército azul sabe esto, por lo que tampoco atacará.
+
+	\par Para ver la relevancia del problema de los dos ejércitos en relación con la liberación de conexiones, simplemente sustituya “atacar” por “desconectar”. Si ninguna de las partes está preparada para desconectarse hasta estar convencida de que la otra está preparada para desconectarse también, nunca ocurrirá la desconexión.
+	
+	\par Vamos a permitir que cada parte decida cuando la conexión está terminada. Este es un problema más sencillo. En la figura 6-14 se muestran cuatro escenarios de liberación de conexión usando un \textit{acuerdo de 3 vías}. Aunque este protocolo no es infalible, generalmente es adecuado.
+	
+	\begin{center}
+		\includegraphics[width=11cm, height=10cm]{./imagenes/conexion.png}
+	\end{center}
+
+	\par En la figura 6-14(a) vemos el caso normal en el que uno de los usuarios envía un segmento DR de solicitud de desconexión (DISCONNECTION REQUEST) con el fin de iniciar la liberación de una conexión. Al llegar, el receptor devuelve también un segmento DR e inicia un temporizador, por si acaso se pierde su DR. Cuando este DR llega, el emisor original envía de regreso un segmento ACK y libera la conexión. Finalmente, cuando llega el segmento ACK, el receptor también libera la conexión. Liberar una conexión significa que la entidad de transporte remueve la información sobre la conexión de su tabla de conexiones abiertas y avisa de alguna manera al dueño de la conexión (el usuario de transporte).
+	
+	\par Si se pierde el último segmento ACK, como se muestra en la figura 6-14(b), el temporizador salva la situación. Al expirar el temporizador, la conexión se libera de todos modos.
+
+	\par Ahora consideremos el caso en el que se pierde el segundo DR. El usuario que inicia la desconexión no recibirá la respuesta esperada, su temporizador expirará y todo comenzará de nuevo. En la figura 6-14(c) vemos la manera en que esto funciona, suponiendo que la segunda vez no se pierden segmentos, y que todos se entregan correctamente y a tiempo.
+
+	\par Nuestro último escenario, la figura 6-14(d), es el mismo que en la figura 6-14(c), excepto que ahora suponemos que todos los intentos repetidos de retransmitir el segmento DR también fallan debido a los segmentos perdidos. Después de N reintentos, el emisor simplemente se da por vencido y libera la conexión. Mientras tanto, expira el temporizador del receptor y también se sale.
+	
+	\par Aunque por lo general basta con este protocolo, en teoría puede fallar si se pierden el DR inicial y N retransmisiones. El emisor se dará por vencido y liberará la conexión, pero el otro lado no sabrá nada sobre los intentos de desconexión y seguirá plenamente activo. Esta situación provoca una \textbf{conexión semiabierta}.
+
+	\par Pudimos haber evitado este problema al impedir que el emisor se diera por vencido después de N reintentos y obligarlo a seguir insistiendo hasta recibir una respuesta. No obstante, si permitimos que expire el temporizador en el otro lado, entonces el emisor continuará por siempre, pues nunca llegará una respuesta. 
+
+	\par Una manera de eliminar las conexiones semiabiertas es tener una regla que diga que, si no han llegado segmentos durante ciertos segundos, se libera automáticamente la conexión. De esta manera, si un lado llega a desconectarse, el otro lado detectará la falta de actividad y también se desconectará. Esta regla también se encarga del caso donde se rompe la conexión (porque la red ya no puede entregar paquetes entre los hosts) sin que ninguno de los extremos se desconecte. Por supuesto que si se pone en práctica esta regla, es necesario que cada entidad de transporte tenga un temporizador que se detenga y se reinicie cada vez que se envíe un segmento.
+
+	\par No se puede garantizar absolutamente que cuando se libera una conexión no ocurre pérdida de datos, pero si se puede limitar mucho que esto suceda. La nueva solución es muchísimo mejor que la de liberación asimétrica.
+
 \subsection{Control de errores y almacenamiento en búfer}
+
+
 \subsection{Multiplexión}
 \subsection{Recuperación de fallas}
+
+
 \section{Control de congestión}
+
+
+
 \subsection{Asignación de ancho de banda deseable }
 \subsection{Regulación de la tasa de envío}
 \subsection{Cuestiones inalámbricas}
 \section{Los protocolos de transporte de internet: UDP}
 \subsection{Introducción a UDP}
+
 \subsection{Llamada a procedimiento remoto}
 \subsection{Protocolos de transporte en tiempo real}
 
@@ -1158,12 +1240,14 @@ Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos mil
 \section{Los protocolos de transporte de internet: TCP}
 
 \subsection{Introducción a TCP}
-\par La mayoría de las aplicaciones en internet necesitan una entrega en secuencia 
+	
+	\par La mayoría de las aplicaciones en internet necesitan una entrega en secuencia 
 confiable, para ellos se diseñó \textbf{TCP (Transmission Control Protocol)} que sirve 
 para proporcionar un flujo de bytes confiable de extremo a extremo a través de una 
 interred no confiable. TCP tiene un diseño que se adapta de manera dinámica a las 
 propiedades de la interred y que se sobrepone a muchos tipos de fallas.
-\par Cada máquina que soporta TCP tiene una entidad de transporte TCP (ETCP), ya 
+
+	\par Cada máquina que soporta TCP tiene una entidad de transporte TCP (ETCP), ya 
 sea un procedimiento de biblioteca, un proceso de usuario, o parte del kernel. En todos 
 los casos maneja flujos TCP e interactúa con la capa IP. Una ETCP acepta flujos de 
 datos de usuario de procesos locales, los divide en fragmentos que no excedan los 64 
@@ -1171,29 +1255,35 @@ KB, y envía cada fragmento como un datagrama IP independiente. Cuando los
 datagramas que contienen datos TCP llegan a una máquina, se pasan a la ETCP, la cual 
 reconstruye los flujos de bytes originales. Usaremos la palabra TCP para referirnos: a 
 veces a la ETCP y a veces al protocolo TCP.
-\par La capa IP no proporciona ninguna garantía de que los datagramas se entregarán 
+
+	\par La capa IP no proporciona ninguna garantía de que los datagramas se entregarán 
 de manera apropiada, por lo que corresponde a TCP terminar los temporizadores y 
 retransmitir los datagramas conforme sea necesario.
-\par Los datagramas que llegan podrán hacerlo en el orden incorrecto, esto sucede 
+
+	\par Los datagramas que llegan podrán hacerlo en el orden incorrecto, esto sucede 
 cuando se trabaja con redes de datagramas. Corresponde a TCP reensamblarlos en 
 mensajes en la secuencia apropiada ya que usualmente la capa de aplicación del 
 receptor necesita procesar los mensajes en el orden en que fueron enviados.
 
 \subsection{El modelo del servicio TCP}
-\par El servicio TCP se obtiene al hacer que tanto el servidor como el cliente creen 
+	
+	\par El servicio TCP se obtiene al hacer que tanto el servidor como el cliente creen 
 puntos terminales llamados \textbf{\textit{sockets}}. Cada socket tiene una dirección 
 que consiste en la dirección IP del host, y un número de 16 bits llamado \textbf{puerto}, el cual es local a ese host. Un puerto es el nombre TCP para un TSAP.
-\par Para obtener el servicio TCP se debe establecer de manera explícita una conexión entre el socket en la máquina emisora y uno en la máquina receptora. Un socket puede usarse para múltiples conexiones al mismo tiempo, dos o más conexiones pueden terminar en el mismo socket. Las conexiones se identifican mediante los identificadores de sockets de los dos extremos, es decir (socket1, socket2).
-\par Todas las conexiones TCP son de dúplex total y de punto a punto.
+
+	\par Para obtener el servicio TCP se debe establecer de manera explícita una conexión entre el socket en la máquina emisora y uno en la máquina receptora. Un socket puede usarse para múltiples conexiones al mismo tiempo, dos o más conexiones pueden terminar en el mismo socket. Las conexiones se identifican mediante los identificadores de sockets de los dos extremos, es decir (socket1, socket2).
+
+	\par Todas las conexiones TCP son de dúplex total y de punto a punto.
 	\begin{itemize}
 		\item Dúplex total: el tráfico puede ir en ambas direcciones al mismo tiempo.
 		\item Punto a punto: cada conexión tiene exactamente dos puntos finales.
 		\item  TCP no soporta la multidifusión ni la difusión.
 	\end{itemize}
-\par Una conexión TCP es un flujo de bytes, no un flujo de mensajes. Los límites de los 
+
+	\par Una conexión TCP es un flujo de bytes, no un flujo de mensajes. Los límites de los 
 mensajes no se preservan de extremo a extremo.
 
-\textbf{Ejemplo:} el proceso emisor realiza 4 escrituras de 512 B en el flujo TCP, tal 
+	\textbf{Ejemplo:} el proceso emisor realiza 4 escrituras de 512 B en el flujo TCP, tal 
 vez estos datos se entreguen al proceso receptor como 4 fragmentos de 512 B, o dos 
 fragmentos de 1024 B, o uno de 2048 B o de alguna otra forma.
 
@@ -1201,16 +1291,16 @@ fragmentos de 1024 B, o uno de 2048 B o de alguna otra forma.
 	\includegraphics[width=14cm, height=4cm]{./imagenes/tcp.png} 
 	\end{center}
 
-\par No hay manera que el receptor detecte las unidades en las que se escribieron los 
+	\par No hay manera que el receptor detecte las unidades en las que se escribieron los 
 datos. El software TCP no tiene idea de lo que significan los bytes y no le interesa 
 averiguarlo.
 
-\par Cuando una aplicación pasa datos a TCP, este decide si los envía inmediatamente 
+	\par Cuando una aplicación pasa datos a TCP, este decide si los envía inmediatamente 
 o si los almacena en el búfer a fin de recolectar una gran cantidad y luego enviarlos al 
 mismo tiempo. Sin embargo la aplicación algunas veces necesita que los datos se 
 envíen de inmediato.
 
-\textbf{Ejemplo:} si un usuario inicia una sesión con una máquina remota. Una vez que 
+	\textbf{Ejemplo:} si un usuario inicia una sesión con una máquina remota. Una vez que 
 se termina una línea de comandos y se introduce un retorno de carro es esencial que la 
 línea se envíe a la máquina remota inmediatamente y que no se almacene en el búfer 
 hasta que llegue la siguiente línea. Para obtener los datos, las aplicaciones pueden 
@@ -1220,7 +1310,7 @@ la transmisión, si llegan indicadores PUSH antes de que el primero se haya tran
 todos los datos con indicadores PUSH en un solo datagrama IP, sin ninguna separación 
 entre las diversas piezas.
 
-Cuando un usuario interactivo oprime las teclas \emph{Ctrl+C} o \textit{Supr} para 
+	\par Cuando un usuario interactivo oprime las teclas \emph{Ctrl+C} o \textit{Supr} para 
 interrumpir una operación remota que ha iniciado, la aplicación emisora coloca 
 información de control en el flujo de datos y se la da a TCP junto con el indicador 
 \textbf{URGENT}. Este evento ocasiona que TCP interrumpa el encolamiento de datos 
@@ -1231,7 +1321,8 @@ El final de los datos urgentes se marca para que la aplicación sepa dónde term
 El inicio de estos no se marca; la aplicación tiene que averiguarlo.
 
 \subsection{Direccionamiento en TCP}
-\par Los numeros de puerto menores que 1024 están reservados para los servicios 
+
+	\par Los numeros de puerto menores que 1024 están reservados para los servicios 
 estándar que, por lo general, sólo los usuarios privilegiados pueden iniciar. Éstos se 
 llaman \textbf{puertos bien conocidos}.
 
@@ -1239,7 +1330,8 @@ llaman \textbf{puertos bien conocidos}.
 	\includegraphics[width=9cm, height=6cm]{./imagenes/protocolo.png} 
 	\end{center}
 
-\par Podría ser posible que el demonio FTP se conecte por sí solo al puerto 21 en 
+
+	\par Podría ser posible que el demonio FTP se conecte por sí solo al puerto 21 en 
 tiempo de arranque, que el demonio SSH se conecte por sí solo al puerto 22 en tiempo 
 de arranque, y así en lo sucesivo. Sin embargo, hacer lo anterior podría llenar la 
 memoria con demonios que están inactivos la mayor parte del tiempo. En su lugar, lo 
@@ -1254,24 +1346,27 @@ configurar el sistema para tener demonios permanentes en los puertos más ocupad
 e \emph{inetd} en los demás.
 
 \subsection{El protocolo TCP}
-\par Cada byte de una conexión TCP tiene su propio número de secuencia de 32 bits. 
-Los múmeros de secuencia separados de 32 bits se usan para confirmaciones de 
+
+	\par Cada byte de una conexión TCP tiene su propio número de secuencia de 32 bits. 
+Los números de secuencia separados de 32 bits se usan para confirmaciones de 
 recepción y para el mecanismo de ventana. La entidad TCP emisora y la receptora 
 intercambian datos en forma de segmentos. Un segmento consiste en un encabezado 
 TCP fijo de 20 bytes (más una parte opcional) seguido de 0 o más bytes de datos. El 
 software de TCP decide el tamaño de los segmentos; puede acumular datos de varias 
 escrituras para formar un segmento, o dividir los datos de una escritura en varios 
 segmentos.
-\par Hay dos límites que restringen el tamaño de segmento:
-	\begin{itemize}
-		\item Cada segmento incluido el encabezado TCP, debe caber en la carga útil de 
+
+	\par Hay dos límites que restringen el tamaño de segmento:
+		\begin{itemize}
+			\item Cada segmento incluido el encabezado TCP, debe caber en la carga útil de 
 		65.515 bytes del IP.
-		\item Cada red tiene una unidad máxima de transferencia (MTU) y cada segmento 
+			\item Cada red tiene una unidad máxima de transferencia (MTU) y cada segmento 
 		debe caber en la MTU.
-		\item En la práctica la MTU es generalmente de 1500 bytes (el tamaño de la 
+			\item En la práctica la MTU es generalmente de 1500 bytes (el tamaño de la 
 		carga útil de Ethernet).
-	\end{itemize}	 
-\par Cuando un transmisor envía un segmento, también inicia un temporizador. Cuando 
+		\end{itemize}	 
+
+	\par Cuando un transmisor envía un segmento, también inicia un temporizador. Cuando 
 llega el segmento a destino, la ETCP receptora devuelve un segmento (con datos si 
 existen, de otro modo sin ellos) que contiene un número de confirmación de recepción 
 igual al siguiente número de secuencia que espera recibir. Si el temporizador del emisor 
@@ -1292,7 +1387,8 @@ expira antes de la recepción de la confirmación, el emisor envía de nuevo el 
 \end{itemize}
 
 \subsection{El encabezado del segmento TCP}
-\par En la figura 6-36 se muestra la distribución de un segmento TCP. Cada segmento 
+
+	\par En la figura 6-36 se muestra la distribución de un segmento TCP. Cada segmento 
 comienza con un encabezado de formato fijo de 20 bytes. El encabezado fijo puede ir 
 seguido de encabezado de opciones. Después de las opciones, si las hay, pueden 
 continuar hasta 65535$-$20$-$20$=$65495 bytes de datos, donde los primeros 20 se 
@@ -1301,54 +1397,58 @@ son legales y se usan por lo común para confirmaciones de recepción y mensajes
 control.
 
 	\begin{center}
-	\includegraphics[width=9cm, height=6cm]{./imagenes/encabezado.png} 
+		\includegraphics[width=9cm, height=6cm]{./imagenes/encabezado.png} 
 	\end{center}
 
-\par Los campos de \textit{puerto de origen} y \textit{puerto de destino} identifican 
+	\par Los campos de \textit{puerto de origen} y \textit{puerto de destino} identifican 
 los puntos terminales locales de la conexión. La dirección de un puerto más la dirección 
 IP del host forman un punto terminal único de 48 bits. Los puntos terminales de origen 
 y de destino en conjunto identifican la conexión.
-\par Los campos \textit{número de secuencia} y \textit{número de confirmación de 
+
+	\par Los campos \textit{número de secuencia} y \textit{número de confirmación de 
 recepción} desempeñan sus funciones normales. El segundo indica el siguiente byte 
 esperado, no el último byte correctamente recibido. Ambos tienen 32 bits de longitud porque cada byte de datos está numerado en el flujo TCP.
-\par La \textit{longitud del encabezado TCP} indica la cantidad de palabras de 32 
+
+	\par La \textit{longitud del encabezado TCP} indica la cantidad de palabras de 32 
 bits contenidas en el encabezado TCP. Esta información es necesaria porque el campo 
 \textit{Opciones} es de longitud variable, por lo que el encabezado también. Este 
 campo indica el comienzo de los datos en el segmento, medido en palabras de 32 bits, 
 pero ese número es simplemente la longitud del encabezado en palabras. A 
 continuación viene un campo de 6 bits que no se usa.
-\par Luego vienen 8 indicadores de 1 bit:
-	\begin{itemize}
-		\item \textbf{CWR} y \textit{ECE} se utilizan para indicar congestión cuando se 
+
+	\par Luego vienen 8 indicadores de 1 bit:
+		\begin{itemize}
+			\item \textbf{CWR} y \textbf{ECE} se utilizan para indicar congestión cuando se 
 		usa ECN (Notificación Explícita de Congestión). ECE se establece para indicar una 
 		\textit{ECN-Echo} a un emisor TCP y decirle que reduzca su velocidad cuando el 
 		receptor TCP recibe una indicación de congestión de la red. CWR se establece 
 		para indicar una \textit{Ventana de congestión} reducida del emisor TCP al 
 		receptor TCP, de modo que sepa que el emisor redujo su velocidad y puede dejar 
 		de enviar la \textit{Repetición de ECN}.
-		\item \textbf{URG} se establece en 1 si está en uso el \textit{Apuntador Urgente}, el cual 
+			\item \textbf{URG} se establece en 1 si está en uso el \textit{Apuntador Urgente}, el cual 
 		sirve para indicar un desplazamiento en bytes a partir del número actual de 
 		secuencia en el que se encuentran datos urgentes, sustituye los mensajes de 
 		interrupción y un mecanismo rudimentario para permitir que el emisor envíe una 
 		señal al receptor sin implicar al TCP en la razón de la interrupción.
-		\item \textbf{ACK} se establece en 1 para indicar que el \textit{Número de confirmación 
+			\item \textbf{ACK} se establece en 1 para indicar que el \textit{Número de confirmación 
 		de recepción} es válido. Si es 0, el segmento no contiene una confirmación de 
 		recepción, por lo que se ignora el campo de número de confirmación de 
 		recepción.
-		\item \textbf{PSH} indica datos que se deben transmitir de inmediato. Por este medio se 
+			\item \textbf{PSH} indica datos que se deben transmitir de inmediato. Por este medio se 
 		solicita atentamente al receptor que entregue los datos a la aplicación a su 
 		llegada y no los almacene en búfer hasta la recepción de un búfer completo.
-		\item \textbf{RST} se usa para restablecer de manera repentina una conexión 
+			\item \textbf{RST} se usa para restablecer de manera repentina una conexión 
 		que se ha confundido debido a una falla de host o alguna otra razón. También se 
 		usa para rechazar un segmento no válido o un intento de abrir una conexión. Por 
 		lo general, si usted recibe un segmento con el bit RST encendido, tiene un 
 		problema entre manos.
-		\item \textbf{SYN} se usa para establecer conexiones, es decir, denotar 
+			\item \textbf{SYN} se usa para establecer conexiones, es decir, denotar 
 		\textit{CONNECTION REQUEST} y \textit{CONNECTION ACCEPTED}.
-		\item \textbf{FIN} se usa para liberar una conexión y especifica que el emisor no 
+			\item \textbf{FIN} se usa para liberar una conexión y especifica que el emisor no 
 		tiene más datos que \textit{transmitir}. 
-	\end{itemize}
-\par El control de flujo en TCP se maneja mediante una ventana deslizante de tamaño 
+		\end{itemize}
+
+	\par El control de flujo en TCP se maneja mediante una ventana deslizante de tamaño 
 variable. El campo \textit{Tamaño de ventana} indica la cantidad de bytes que se 
 pueden enviar, comenzando por el byte cuya recepción se ha confirmado. Un campo 
 de \textit{Tamaño de ventana} de 0 es válido e indica que se han recibido los bytes 
@@ -1356,21 +1456,83 @@ hasta \textit{Número de confrmación de recepción}$-$1.
 
 \subsection{Establecimiento de una conexión TCP}
 
-\par En TCP las conexiones se establecen mediante el acuerdo de tres vías. Para establecer una conexión, el \textbf{servidor} espera en forma pasiva una conexión entrante mediante la ejecución de las primitivas LISTEN y ACCEPT en ese orden, ya sea que se especifique un origen determinado o a nadie en particular.
+	\par En TCP las conexiones se establecen mediante el acuerdo de tres vías. Para establecer una conexión, el \textbf{servidor} espera en forma pasiva una conexión entrante mediante la ejecución de las primitivas LISTEN y ACCEPT en ese orden, ya sea que se especifique un origen determinado o a nadie en particular.
 
-\par Del otro lado el cliente ejecuta una primitiva CONNECT en la que especifica la dirección y el puerto con el que se desea conectar, el tamaño máximo de segmento TCP que está dispuesto a aceptar y de manera opcional algunos datos de usuario (por ejemplo, una contraseña). La primitiva CONNECT envía un segmento TCP con el bit SYN encendido y el bit ACK apagado, y espera una respuesta.
+	\par Del otro lado el cliente ejecuta una primitiva CONNECT en la que especifica la dirección y el puerto con el que se desea conectar, el tamaño máximo de segmento TCP que está dispuesto a aceptar y de manera opcional algunos datos de usuario (por ejemplo, una contraseña). La primitiva CONNECT envía un segmento TCP con el bit SYN encendido y el bit ACK apagado, y espera una respuesta.
 
-\par Cuando este segmento llega al destino, la entidad TCP de ahí revisa si hay un proceso que haya ejecutado una primitiva LISTEN en el puerto que se indica en el campo Puerto de destino. Si no lo hay, envía una respuesta con el bit RST encendido para rechazar la conexión.
+	\par Cuando este segmento llega al destino, la entidad TCP de ahí revisa si hay un proceso que haya ejecutado una primitiva LISTEN en el puerto que se indica en el campo \textit{Puerto de destino}. Si no lo hay, envía una respuesta con el bit RST encendido para rechazar la conexión.
 
-\par Si algún proceso está escuchando en el puerto, ese proceso recibe el segmento TCP entrante y puede entonces aceptar o rechazar la conexión. Si la acepta, se devuelve un segmento de confirmación de recepción. La secuencia de segmentos TCP enviados en el caso normal se muestra en la figura 6-37(a). Observe que un segmento SYN consume 1 byte de espacio de secuencia, por lo que se puede reconocer sin ambigüedades.
+	\par Si algún proceso está escuchando en el puerto, ese proceso recibe el segmento TCP entrante y puede entonces aceptar o rechazar la conexión. Si la acepta, se devuelve un segmento de confirmación de recepción. La secuencia de segmentos TCP enviados en el caso normal se muestra en la figura 6-37(a). Observe que un segmento SYN consume 1 byte de espacio de secuencia, por lo que se puede reconocer sin ambigüedades.
 
+	\begin{center}
+		\includegraphics[width=8cm, height=6cm]{./imagenes/conexiontcp.png}
+	\end{center}
 
 \subsection{Liberación de una conexión TCP}
-\subsection{Modelado de administración de conexiones TCP}
-\subsection{Ventana deslizante de TCP}
+
+	\par Aunque las conexiones TCP son full dúplex, para entender la manera en que se liberan las conexiones es mejor visualizarlas como un par de conexiones simplex. Cada conexión simplex se libera de manera independiente de su igual. Para liberar una conexión, cualquiera de las partes puede enviar un segmento TCP con el bit FIN establecido, lo que significa que no tiene más datos por transmitir. Al confirmarse la recepción de FIN, se apaga ese sentido para que no se transmitan nuevos datos. Sin embargo, lo datos pueden seguir fluyendo de manera indefinida por el otro sentido. Cuando se apagan ambos sentidos, se libera la conexión. Por lo general se requieren cuatro segmentos TCP para liberar una conexión: un FIN y un ACK para cada sentido. Sin embargo, es posible que el primer ACK y el segundo FIN estén contenidos en el mismo segmento, con lo cual se reduce la cuenta total a tres.
+	
+	\par Ambos extremos de una conexión TCP pueden enviar segmentos FIN al mismo tiempo. La recepción de ambos se confirma de la manera usual, y se apaga la conexión. De hecho, en esencia no hay diferencia entre la liberación secuencial o simultánea por parte de los hosts.
+	
+	\par Para evitar el problema de los dos ejércitos, se usan temporizadores. Si no llega una respuesta a un FIN en un máximo de dos tiempos de vida del paquete, el emisor del FIN libera la conexión. Tarde o temprano el otro lado notará que, al parecer, ya nadie lo está escuchando, y también expirará su temporizador. En la práctica, pocas veces ocurren problemas.
+
 \subsection{Administración de temporizadores de TCP}
+
+	\par TCP usa varios temporizadores (al menos de manera conceptual) para hacer su trabajo. El más importante de éstos es el RTO (\textbf{Retransmission TimeOut}). Cuando se envía un segmento, se inicia un temporizador de retransmisiones. Si la confirmación de recepción del segmento llega antes de que expire el temporizador, éste se detiene. Por otro lado, si el temporizador termina antes de que llegue la confirmación de recepción, se retransmite el segmento (y se inicia de nuevo el temporizador). Surge entonces la pregunta: ¿Qué tan grande debe ser el intervalo de expiración del temporizador?
+
+	\begin{center}
+		\includegraphics[width=9cm, height=6cm]{./imagenes/temporalizador.png}
+	\end{center}
+
+	\par La función de densidad de probabilidad del tiempo que tarda en regresar una confirmación de recepción TCP se parece más a la figura 6-42(b) que a la figura 6-42(a). Es más grande y variable. Es complicado determinar el tiempo de ida y vuelta al destino. Incluso cuando se conoce, es difícil decidir sobre el intervalo de expiración del temporizador. Si se establece demasiado corto, por decir \textit{T1} en la figura 6-42(b), ocurrirán retransmisiones innecesarias e Internet se llenará de paquetes inútiles. Si se establece demasiado largo (por ejemplo, \textit{T2}), el desempeño sufrirá debido al largo retardo de retransmisión de cada paquete perdido. Es más, la varianza y la media de la distribución de llegadas de confirmaciones de recepción pueden variar con rapidez en unos cuantos segundos, a medida que se generan y se resuelven congestionamientos.
+
+	\par La solución es usar un algoritmo dinámico que ajuste de manera constante el intervalo de expiración del temporizador, con base en mediciones continuas del desempeño de la red. El algoritmo utilizado por lo general por el TCP se lo debemos a \textbf{Jacobson} y funciona de la siguiente manera. Por cada conexión, TCP mantiene una variable llamada SRTT (\textbf{Tiempo de Ida y Vuelta Suavizado}), que es la mejor estimación actual del tiempo de ida y vuelta al destino en cuestión. Al enviarse un segmento, se inicia un temporizador, tanto para ver el tiempo que tarda la confirmación de recepción como para activar una retransmisión si se tarda demasiado. Si llega la confirmación de recepción antes de expirar el temporizador, TCP mide el tiempo que tardó la confirmación de recepción, por decir R. Luego actualiza el SRTT de acuerdo con la fórmula:
+	
+	\begin{center}
+		$ SRTT =   \alpha SRTT + (1 – \alpha ) R $
+	\end{center}
+
+	\par en donde $\alpha$ es un factor de suavizado que determina la rapidez con que se olvidan los valores anteriores. Por lo común, $\alpha = 7/8$.
+
+	\par Incluso con un buen valor de SRTT, seleccionar la expiración adecuada del temporizador de retransmisión no es un asunto sencillo. Las primeras implementaciones de TCP usaban 2xRTT, pero la experiencia demostró que un valor constante era inflexible, puesto que no respondía cuando subía la varianza.
+
+	\par Para corregir este problema, Jacobson propuso hacer que el valor de expiración del temporizador fuera sensible a la diferencia en los tiempos de ida y vuelta, así como al tiempo de ida y vuelta suavizado. Para este cambio hay que llevar el registro de otra variable suavizada, RTTVAR (\textbf{Variación de Tiempo de Ida y Vuelta}) que se actualiza mediante la siguiente fórmula:
+
+	\begin{center}
+		$ RTTVAR = \beta RTTVAR + (1 – \beta) | SRTT – R | $
+	\end{center}	 
+
+	\par por lo general, $\beta = 3/4$. El tiempo de expiración de retransmisión,
+RTO, se establece así:
+
+	\begin{center}
+		$ RTO = SRT + 4 RTTVAR $
+	\end{center}
+
+\par La elección del factor 4 es un tanto arbitraria, pero se puede hacer la multiplicación por 4 con un solo desplazamiento y menos de 1\% de todos los paquetes llegan después de más de cuatro desviaciones estándar. Observe que RTTVAR no es exactamente lo mismo que la desviación estándar (en realidad es la desviación media), pero es lo bastante parecida en la práctica.	
+	
+	\par Un problema que ocurre con la recopilación de las muestras, R, del tiempo de ida y 
+	vuelta es qué hacer cuando expira el temporizador de un segmento y se envía de 
+	nuevo. Cuando llega la confirmación de recepción, no está claro si ésta se refiere a la 
+	primera transmisión o a una posterior. Si adivinamos mal se puede contaminar 
+	seriamente el temporizador de retransmisión. Karn hizo una propuesta sencilla: no 
+	actualizar las estimaciones sobre ninguno de los segmentos retransmitidos. Además, se 
+	duplicará el tiempo de expiración con cada retransmisión sucesiva hasta que los 
+	segmentos pasen a la primera. La mayoría de las implementaciones de TCP lo utilizan.
+	
+	\par El temporizador de retransmisiones no es el único temporizador que TCP utiliza. El \textbf{temporizador de persistencia} es el segundo de ellos. Está diseñado para evitar el siguiente interbloqueo.
+	\begin{enumerate}
+		\item  El receptor envía una confirmación de recepción con un tamaño de ventana de 0 para indicar al emisor que espere.
+		\item Después el receptor actualiza la ventana, pero se pierde el paquete con la actualización.
+		\item Ahora, tanto el emisor como el receptor están esperando a que el otro haga algo.
+	\end{enumerate}	
+	
+	\par Cuando expira el temporizador de persistencia, el emisor transmite un sondeo al receptor. La respuesta al sondeo proporciona el tamaño de la ventana. Si aún es cero, se inicia el temporizador de persistencia una vez más y se repite el ciclo. Si es diferente de cero, ahora se pueden enviar datos.
+
+	\par Un tercer temporizador que utilizan algunas implementaciones es el \textbf{temporizador de seguir con vida} (\textit{keepalive}). Cuando una conexión ha estado inactiva durante demasiado tiempo, el temporizador de seguir con vida puede expirar para ocasionar que un lado compruebe que el otro aún está ahí. Si no se recibe respuesta, se termina la conexión. Esta característica es controversial puesto que agrega sobrecarga y puede terminar una conexión saludable debido a una partición temporal de la red.
+
 \subsection{Control de congestión en TCP}
-\subsection{El futuro de TCP}
+
 
 \begin{thebibliography}{X}
 \bibitem{Baz} \textsc{tanenbaun andrew S. y wetherall, david j.}
