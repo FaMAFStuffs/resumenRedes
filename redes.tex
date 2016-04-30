@@ -1765,15 +1765,154 @@ RTO, se establece así:
 	\end{itemize}
 
 
+\chapter{LA CAPA DE APLICACIÖN}
 
+	\section{World Wide Web}
+	
+		\par La web, popularmente conocida como \textit{World Wide Web}, es un marco arquitectónico para acceder a cierto contenido vinculado distribuido en millones de máquinas por toda Internet. En 1994, el CERN y el MIT firmaron un acuerdo para establecer el \textbf{W3C} (\textit{World Wide Web Consortium}), una organización dedicada al desarrollo de web, a la estandarización de protocolos.
+		
+		\subsection{Panorama de la aquitectura}
+		
+			\par Desde el punto de vista del usuario, la web consiste en una enorme colección de contenido en forma de páginas web, por lo general, conocidas simplemente como páginas. Cada una puede contener vínculos a otras páginas en cualquier lugar del mundo. Para seguir un vínculo, los usuarios pueden hacer clic en él, y a continuación los llevará a la página apuntada. Este proceso se puede repetir de manera indefinida. La idea de hacer que una página apunte a otra, lo que ahora se conoce como \textbf{hipertexto}.
+			
+			\par Por lo general, las páginas se ven mediante un programa llamado navegador. Firefox, Internet Explorer y Chrome son ejemplos de navegadores populares. El navegador obtiene la página solicitada, interpreta el contenido y despliega la página en pantalla con el formato adecuado.
+			
+			\begin{center}
+				\includegraphics[width=9cm, height=5cm]{./imagenes/web.png} 
+			\end{center}
+			
+			\subsubsection{El lado del cliente}
+						
+				\par Un hipervínculo incrustado en una página web necesita una manera de nombrar cualquier página que se encuentre en la web. Las páginas se nombran usando URLs (Localizadores Uniformes de Recursos), los cuales tienen tres partes:
 
+				\begin{enumerate}
+					\item El nombre del protocolo, en este caso es HTTP.
+					\item Un nombre DNS de la máquina donde se localizala página.
+					\item El nombre del archivo que contiene la página.
+				\end{enumerate}
 
+			\par Cuando un usuario hace click en un vínculo, el navegador sigue los siguientes pasos:
+				\begin{enumerate}
+					\item El navegador determina el URL
+					\item El navegador pide al DNS la dirección IP del nombre DNS del URL.
+					\item El DNS responde con la dirección IP.
+					\item El navegador hace una conexión TCP con el puerto 80 en la dirección IP.
+					\item El navegador envía un mensaje en el que solicita el archivo del URL.
+					\item El servidor envía el archivo solicitado al navegador.
+					\item Se libera la conexión TCP.
+					\item El navegador despliega todo el texto del archivo.
+					\item El navegador obtiene y despliega todas las imágenes del archivo.
+				\end{enumerate}
 
+			\subsubsection{Tipos MIME}
 
+				\par Para poder desplegar una página el navegador tiene que entender su formato. Para permitir que todos los navegadores entiendan todas las páginas web, estas se escriben en un lenguaje estandarizado llamado HTML. Las páginas web pueden tener íconos, figuras, fotos, tablas; cada uno de estos puede enlazarse a otras páginas.
 
+				\par El navegador es básicamente un intérprete HTML. La mayoría de los navegadores tiene varios botones y características para facilitar la navegación web. Botones para ir a la página anterior y a la página siguiente, establecer un marcador (\textit{bookmark}), ver la lista de marcadores. Las páginas también pueden guardarse en disco e imprimirse.
+				
+				\par No todas las páginas necesitan contener HTML. Una página puede consistir de un video en formato MPEG, un documento en formato PDF, una fotografía en formato JPEG, una canción en formato MP3 o cualquiera de cientos de otros tipos de archivos. Como las páginas HTML estándar pueden vincular a cualquiera de estos elementos, el navegador tiene un problema cuando llega a una página que no sabe cómo interpretar.
 
+				\par En vez de hacer los navegadores cada vez más grandes al construir intérpretes para una colección extensa de tipos de archivos que aumenta con rapidez, la mayoría de los navegadores han elegido una solución más general. Cuando un servidor devuelve una página, también devuelve cierta información adicional sobre ella. Esta información incluye el tipo MIME de la página. Las páginas de tipo \textit{text/html} sólo se despliegan directamente, al igual que las páginas en unos cuantos tipos integrados más. Si el tipo MIME no es de los integrados, el navegador consulta su tabla de tipos MIME para determinar cómo desplegar la página. Esta tabla asocia los tipos MIME con los visores.
 
+				\par Existen dos posibilidades: complementos (\textit{plug-ins}) y aplicaciones auxiliares. Un \textit{plug-in} es un módulo de código de terceros que se instala como una extensión para el navegador. Como los complementos se ejecutan dentro del navegador, tienen acceso a la página actual y pueden modificar su apariencia.
+				
+				\par Para poder usar un plug-in primero debe instalarse. El navegador tiene un directorio de plug-ins, donde se lo coloca. Además se registra el tipo MIME del plug-in para poder asociarlo con este. Cada navegador tiene un conjunto de procedimientos que todos los plug-in tienen que implementar a fin de que el navegador pueda llamarlos (la \textit{ interfaz del plug-in}).
 
+				\par El navegador pone a disposición de los plug-in un conjunto de sus procedimientos, llamados \textbf{interfaz del navegador}. Los procedimientos comunes en la interfaz del navegador son para asignar y liberar memoria, desplegar un mensaje en la línea de estado del navegador y consultar al navegador sobre los parámetros. Después de que el plug-in ha hecho su trabajo, se lo elimina de la memoria del navegador.
+				
+				\par Otra forma de ampliar el navegador es con el uso de aplicaciones auxiliares. Estas son programas completos que se ejecutan como procesos
+independientes. Las aplicaciones auxiliares no ofrecen interfaz al navegador ni usan servicios de este, por lo general solo aceptan el nombre de un archivo de trabajo y lo abren y despliegan. Ejemplos de aplicaciones auxiliares son Acrobat Reader y Microsoft Word.
+
+				\par Muchas aplicaciones auxiliares usan el tipo MIME \textit{application}. Como consecuencia se ha definido un número considerable de subtipos para que los utilicen; por ejemplo, \textit{application/vnd.ms-powerpoint} para los archivos de PowerPoint. Las aplicaciones ayudantes no están restringidas al uso del tipo MIME \textit{application}. Por ejemplo, Adobe Photoshop usa \textit{image/x-photoshop}.
+				
+				\begin{center}
+					\includegraphics[width=9cm, height=5cm]{./imagenes/plugin.png} 
+				\end{center}
+		
+			\subsubsection{El lado del servidor}
+			
+				\par Un servidor web  recibe el nombre de un archivo que debe buscar y devolver a través de la red. En ambos casos, los pasos que el servidor realiza en su ciclo principal son:
+
+				\begin{enumerate}
+					\item Aceptar una conexión TCP de un cliente (un navegador).
+					\item Obtener la ruta a la página, que viene siendo el nombre del archivo solicitado.
+					\item Obtener el archivo (del disco).
+					\item Enviar el contenido del archivo al cliente.
+					\item Liberar la conexión TCP.
+				\end{enumerate}	
+
+				\par En el diseño anterior cada solicitud requiere un acceso al disco para obtener el archivo. Entonces el servidor web no puede atender más pedidos por segundo que accesos a disco. Para un sitio web grande, esto es un problema. Una mejora usada por los servidores web es mantener una cacé en la memoria de los \textit{N} archivos más recientemente utilizados.
+
+				\par Para lidiar con el problema de atender una sola solicitud a la vez, una estrategia es hacer al servidor multihilos. En un diseño, el servidor consiste en un módulo de \emph{front-end} que acepta todas las solicitudes entrantes y \textit{K} módulos de procesamiento, como se muestra en la figura 7-21. Los \textit{$K+1$} hilos pertenecen al mismo proceso, por lo que todos los módulos de procesamiento tienen acceso a la caché dentro del espacio de direcciones del proceso.
+				
+				\begin{center}
+					\includegraphics[width=9cm, height=5cm]{./imagenes/frontend.png} 
+				\end{center}
+				
+				\par A continuación los pasos de un servidor web con múltiples hilos:
+				
+				\begin{enumerate}
+					\item Cuando llega una solicitud el \textit{front-end} la acepta y construye un registro corto que la describe.
+					\item Después entrega el registro a uno de los módulos de procesamiento.
+					\item El módulo de procesamiento primero verifica el caché para ver si el archivo está allí.
+					\item Si el archivo está en caché actualiza el registro para incluir un apuntador al archivo.
+					\item Si el archivo no está en caché el módulo de procesamiento inicia una operación de disco. Cuando el archivo llega del disco se coloca en la caché y se regresa al cliente.
+					\item Mientras uno o más módulo de procesamiento están bloqueados esperando a que termine una operación del disco, otros módulo de procesamiento pueden estar trabajando en otras solicitudes.
+					\item Conviene tener además múltiples discos, para que más de un disco pueda estar ocupado al mismo tiempo.
+				\end{enumerate}
+
+				\par Los modernos servidores web hacen más que sólo aceptar nombres de rutas y regresar archivos. De hecho, el procesamiento real de cada solicitud puede ser muy complicado. Por esta razón, en muchos servidores cada módulo de procesamiento realiza una serie de pasos. El \textit{front-end} pasa cada solicitud entrante al primer módulo disponible, que a su vez la atiende mediante el uso de algún subconjunto de los siguientes pasos:
+				
+				\begin{enumerate}
+					\item \textbf{Resuelve el nombre de la página web solicitada:} La solicitud entrante tal vez no contenga el nombre real del archivo como una cadena literal. Ej: se puede recibir un nombre de dominio sin nombre de archivo; este tiene que expandirse a un nombre de archivo predeterminado. Los navegadores pueden especificar el lenguaje predeterminado del usuario, lo cual posibilita que el servidor seleccione una página web en ese lenguaje.
+					\item \textbf{Autentica al cliente:} se usa para las páginas que no están disponibles para el público en general.
+					\item \textbf{Realiza el control de acceso en el cliente:} se verifica si hay restricciones con respecto a si la solicitud se puede satisfacer a partir de la identidad y ubicación del cliente.
+					\item \textbf{Realiza el control de acceso en la página web:} Se verifica si hay restricciones de acceso asociadas con la página misma. La página deseada puede prohibir que dominios particulares accedan al archivo.
+					\item \textbf{Verifica el caché}.
+					\item \textbf{Obtiene del disco la página solicitada}: se necesita poder manejar múltiples lecturas de disco al mismo tiempo.
+					\item \textbf{Determina el tipo MIME que se incluirá en la respuesta}: se determina el tipo MIME a partir de la extensión del archivo, de las primeras palabras del archivo, de un archivo de configuración y, posiblemente de otros recursos.
+					\item \textbf{Se encarga de diversos detalles:} por ejemplo la construcción de un perfil de usuario o la recolección de ciertas estadísticas.
+					\item \textbf{Regresa la respuesta al cliente}.
+					\item \textbf{Realiza una entrada en el registro del servidor, para propósitos administrativos:} estos registros pueden examinarse en búsqueda de información valiosa acerca del comportamiento de los usuarios, como el orden en que acceden las páginas.
+				\end{enumerate}
+
+				\par Si llegan demasiadas solicitudes cada segundo, la CPU no será capaz de manejar la carga de procesamiento, sin importar cuántos discos se usen en paralelo. La solución es agregar más nodos, posiblemente con discos replicados (para evitar que los discos se vuelvan el siguiente cuello de botella). Esta idea lleva al modelo de granja de servidores, un \textit{fornt-end} aun acepta solicitudes entrantes pero las distribuye en múltiples CPUs. Las máquinas individuales podrán contar con múltiples subprocesos y canales como en el esquema anterior.
+
+				\begin{center}
+					\includegraphics[width=9cm, height=5cm]{./imagenes/farm.png} 
+				\end{center}
+
+				\par En las granjas de servidores no hay caché compartido. Se puede usar un multiprocesador de memoria compartida costoso. Otra forma: Un \textit{front-end} puede registrar el lugar de donde proviene cada respuesta y enviar las solicitudes subsecuentes de la misma página al mismo nodo, así cada nodo es un especialista en ciertas páginas. Para que el espacio en caché no se desperdicie al tener cada archivo en varias caché.
+				
+				\par Otro problema problema es que en las granjas de servidores la conexión TCP del cliente termina en el \textit{front-end}, por lo que la respuesta pasa a través del \textit{front-end}. El punto final de la conexión TCP se pasa al nodo de procesamiento a fin de que pueda contestar directamente al cliente. Esto se llama \textbf{transferencia de TCP}.
+
+				\begin{center}
+					\includegraphics[width=8cm, height=5cm]{./imagenes/serverfarm.png} 
+				\end{center}
+
+			\subsubsection{Cookies}
+				
+				\par Luego de retornar una página web el servidor olvida que ha visto alguna vez a ese cliente particular. Algunos sitios web requieren que los usuarios se registren para poder usarlos. En comercio electrónico, si un usuario navega y coloca artículos en un carrito de compras de vez en cuando.
+				
+				\par Los servidores podrían seguir la pista de los usuarios al ver sus direcciones IP. Esta idea no funciona ya que hay muchos usuarios trabajando con computadoras compartidas y muchos ISP utilizan NAT por lo que todos los paquetes salientes de todos los usuarios tienen la misma dirección IP. Netscape diseñó una técnica llamada \textit{cookies}. Una cookie es un pequeño archivo o cadena (de a lo sumo 4KB). Los navegadores almacenan cookies ofrecidas en un directorio de cookies, en el disco duro de la máquina del cliente, al menos que el usuario las haya deshabilitado.
+
+				\par Cuando un cliente solicita una página web, el servidor puede proporcionar una cookie (conteniendo información adicional) junto con la página solicitada. Justo antes de que un navegador solicite una página a un sitio web, verifica su directorio de cookies para ver si el dominio al que está solicitando la página ya colocó alguna cookie. De ser así, todas las cookies para ese dominio se incluyen en el mensaje de la solicitud. Cuando el servidor web las obtiene, puede interpretarlas de la forma que desee.
+
+				\par Una cookie puede contener hasta 5 campos.
+				
+				\begin{enumerate}
+						\item El \textbf{dominio} indica de dónde viene el cookie. Cada dominio puede almacenar hasta 20 cookies por cliente.
+						\item La \textbf{ruta} en la estructura del directorio del servidor que identifica qué partes del árbol de archivos del servidor podrían usar el cookie.
+						\item El campo \textbf{contenido} toma la forma $nombre = valor$.
+						\item El campo \textbf{expira} indica cuando caduca la cookie. Si este campo está ausente, el navegador descarta la cookie cuando sale (\textit{cookies no persistentes}). Si se proporciona una hora y una fecha se dice que la cookie es persistente y se mantiene hasta que expira.
+						\item El campo \textbf{seguro} puede establecerse para indicar que el navegador podría simplemente regresar la cookie a un servidor seguro. Esto se usa para aplicaciones seguras (Ej: comercio electrónico, actividades bancarias, etc.) 
+				\end{enumerate}
+
+				\begin{center}
+					\includegraphics[width=11cm, height=4cm]{./imagenes/cookie.png} 
+				\end{center}
+								
+				\par Para eliminar una cookie del disco duro de un cliente, el servidor simplemente la envía nuevamente, pero con una fecha caducada.
 
 
 
