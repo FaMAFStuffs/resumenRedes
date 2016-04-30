@@ -69,7 +69,7 @@ el cable, se espera un tiempo aleatorio e intenta más tarde.
 
 \subsection{Redes de área metropolitana}
 \par Una Red de área Metropolitana, o MAN (Metropolitan Area Network), cubre toda 
-una ciudad. \\
+una ciudad.
 
 \textbf{Ejemplo 1:} MAN basada en TV por cable
 	\begin{itemize}
@@ -1212,21 +1212,83 @@ Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos mil
 
 	\par No se puede garantizar absolutamente que cuando se libera una conexión no ocurre pérdida de datos, pero si se puede limitar mucho que esto suceda. La nueva solución es muchísimo mejor que la de liberación asimétrica.
 
-\subsection{Control de errores y almacenamiento en búfer}
+\subsection{Control de flujo y almacenamiento en búfer}
 
+\subsubsection{Uso de búferes}
 
-\subsection{Multiplexión}
-\subsection{Recuperación de fallas}
+	\par Si la subred provee un servicio de datagramas, la entidad de transporte emisora debe manejar búferes para los mensajes de salida. Si el receptor sabe que el emisor almacena en búfer todas los segmentos hasta que se confirma su recepción, el receptor podría o no dedicar búferes específicos a conexiones específicas según considere necesario. Cuando entra un segmento, el receptor intenta adquirir un búfer nuevo, si hay uno disponible, se acepta el segmento; de otro modo se lo descarta. Dado que el emisor está preparado para retransmitir los segmentos perdidos por la subred, no hay nada de malo en hacer que el receptor se deshaga de los segmentos. El emisor simplemente sigue intentando hasta que recibe una ACK.
+	
+	\par Aun si el receptor está de acuerdo en usar búferes, todavía queda la cuestión del tamaño de estos. Tres ideas: 
+	\begin{enumerate}
+		\item \underline{Uso de búferes de tamaño fijo:} si la mayoría de los segmentos tiene aproximadamente el mismo tamaño organizar los búferes como un grupo de búferes de tamaño idéntico, con un segmento por búfer como en la figura 15 a). El problema con este método es que si hay una variación grande en el tamaño de los segmentos, el grupo de búferes de tamaño fijo presenta problemas. Si el tamaño de búfer se escoge igual al tamaño del segmento más grande, se desperdiciará espacio cada vez que llegue un segmento corto. Si el tamaño se escoge menor que el tamaño máximo de segmento, se requerirán varios búferes para los segmentos grandes, con la complejidad inherente.
 
+		\item \underline{Uso de búferes de tamaño variable:} la ventaja aquí es un mejor uso de la memoria, al costo de una administración de búferes más complicada. Esta solución se ve ilustrada en la figura 6-15 b).
 
-\section{Control de congestión}
+		\item \underline{Búfer Circular:}	dedicar un solo búfer circular grande por conexión, como en la figura 6-15 c). Con este método se hace buen uso de la memoria cuando todas las conexiones tienen una carga alta, pero es deficiente si algunas conexiones cuentan con poca carga.
+	\end{enumerate}	 
+	
+	\begin{center}
+		\includegraphics[width=9cm, height=6cm]{./imagenes/bufer.png} 
+	\end{center}
+	
+	\par El equilibrio óptimo entre el almacenamiento en búfer en el origen y en el destino depende del tipo de tráfico transportado por la conexión. Para un tráfico de bajo ancho de banda con ráfagas, como el producido por una terminal interactiva, es mejor no dedicarle búferes, sino adquirirlos de manera dinámica en ambos extremos. 
+	
+	\par Dado que el emisor no puede estar seguro que el receptor será capaz de adquirir un búfer, el emisor debe retener una copia del segmento hasta recibir su ACK. Por otro lado, para la transferencia de archivos y otro tráfico de alto ancho de banda, es mejor si el receptor dedica una ventana completa de búferes, para permitir el flujo de datos a máxima velocidad. Además para un tráfico en ráfagas de bajo ancho de banda es mejor mantener búferes en el emisor mientras que para tráfico continuo de alto ancho de banda, es mejor hacerlo en el receptor.
+	
+\subsubsection{Control de flujo}
 
+	\par El problema aquí es evitar que un emisor rápido desborde a un receptor lento. Para el envío de segmentos el \textit{host emisor} tiene un tamaño de ventana que es la mayor cantidad de datos que pueden ser enviados antes de que llegue una confirmación de recepción. Un \textit{host emisor} puede extraer segmentos a enviar que llenen el tamaño de ventana y transmite una copia de cada segmento. Cada uno de esos segmentos se guarda en búfer por si hace falta retransmitirlo. El \textit{host receptor} debe tener un espacio de búferes para la ventana entera del emisor. Si los segmentos llegan en orden, el receptor los pasa a la aplicación receptora y transmite una confirmación de recepción de los mismos al emisor. Cuando llega la confirmación de recepción el emisor descarta las copias de los segmentos confirmados y transmite el próximo segmento.
 
+	\par A medida que se abren y cierran conexiones, y a medida que cambia el patrón del tráfico, el emisor y el receptor necesitan ajustar dinámicamente sus asignaciones de búferes por lo que el protocolo de transporte debe permitir que un \textit{host emisor} solicite espacio en búfer en el otro extremo. Los búferes podrían repartirse por conexión, o en conjunto, para todas las conexiones en operación entre los dos hosts. Si aumentara la cantidad de conexiones abiertas, podría ser necesario reducir una asignación, por lo que el protocolo debe contemplar esta posibilidad.
+	
+	\par Inicialmente el emisor solicita una cierta cantidad de búferes, con base en sus necesidades percibidas. El receptor otorga entonces tantos búferes como puede, sabiendo su capacidad de manejo de búferes (pero sin saber el tráfico generado) podría indicar al emisor “te he reservado X búferes”. El receptor entonces incorpora tanto las confirmaciones de recepción como las asignaciones de búfer al tráfico de regreso y lleva la cuenta de su asignación de búferes con el receptor. La asignación de búferes disponibles en el emisor debe disminuir cada vez que el emisor envía un segmento. Si ésta asignación llegase a 0 el emisor debe detenerse por completo.
 
-\subsection{Asignación de ancho de banda deseable }
-\subsection{Regulación de la tasa de envío}
-\subsection{Cuestiones inalámbricas}
+	
+	\begin{center} 
+			\includegraphics[width=11cm, height=9cm]{./imagenes/flujo.png} 
+	\end{center}
 
+\par En la figura 6-16 podemos ver la administración dinámica de ventanas en subred de datagramas con números de secuencia de 4 bits. Supongamos que la información de asignación de búferes viaja en segmentos distintos y no se incorpora en el tráfico de regreso. Inicialmente A quiere 8 búferes, pero se le otorgan solamente 4. Entonces envía 3 segmentos, de los cuales se pierde el tercero. El segmento 6 confirma la recepción de todos los segmentos hasta el número de secuencia 1, inclusive, permitiendo por lo tanto que A libere esos búferes, y además informa a A que tiene permiso de enviar 3 segmentos más comenzando después de 1 (es decir los segmentos 2, 3, y 4). A sabe que ya ha enviado el número 2, por lo que piensa que debe enviar los segmentos 3 y 4, lo que procede a hacer. En este punto se bloquea y debe esperar una nueva asignación de búfer. 
+
+	\par Por otro lado, las retransmisiones inducidas por expiraciones del temporizador (línea 9) sí pueden ocurrir durante el bloqueo, pues usan búferes ya asignados. En la línea 10 B confirma la recepción de todas los segmentos hasta el 4 inclusive, pero se niega a permitir que A continúe. El siguiente segmento de B a A asigna otro búfer y permite a A continuar.
+
+	\par Pueden surgir problemas potenciales con los esquemas de asignación de búferes de este tipo en las subredes de datagramas si hay pérdidas de segmento. Observe la línea 16. B ha asignado ahora más búferes a A, pero el segmento de asignación se perdió. Dado que los segmentos de control no están en secuencia, A se encuentra estancado. Para evitar esta situación cada \textit{host} debe enviar periódicamente un segmento de control con la confirmación de recepción y estado de búferes de cada conexión, de esta manera el estancamiento se romperá tarde o temprano.
+
+\subsection{Recuperación de caídas}
+
+	\par Si los \textit{hosts} y los enrutadores están sujetos a fallas o las conexiones son de larga duración (por ejemplo, descargas extensas de software o medios), la recuperación de estas fallas se vuelve un tema importante. Si la entidad de transporte está totalmente dentro de los \textit{hosts}, la recuperación de fallas de la red y de los enrutadores es sencilla. Las entidades de transporte esperan la pérdida de segmentos todo el tiempo y saben cómo lidiar con esto mediante el uso de retransmisiones.
+
+	\par Un problema más complicado es cómo recuperarse de las fallas del \textit{host}. En particular, tal vez sea conveniente que los clientes sean capaces de continuar trabajando cuando los servidores fallan y se reinician muy rápido. Supongamos que un \textit{host}, el cliente, envía un archivo grande a otro \textit{host}, el servidor de archivos, mediante el uso de un protocolo simple de parada y espera. La capa de transporte en el servidor simplemente pasa los segmentos entrantes al usuario de transporte, uno por uno. De pronto, a mitad de la transmisioón falla el servidor. Al reactivarse, sus tablas se reinicializan, por lo que ya no sabe precisamente en dónde se encontraba.
+
+	\par En un intento por recuperar su estado previo, el servidor podría enviar un segmento de difusión a todos los demás \textit{hosts}, para anunciar que acaba de fallar y solicitar a sus clientes que le informen sobre el estado de todas las conexiones abiertas. Cada cliente puede estar en uno de dos estados: un segmento pendiente (\textit{S1}) o ningún segmento pendiente (\textit{S0}). Con base en esta información de estado, el cliente debe decidir si retransmitirá o no el segmento más reciente.
+	
+	\par A primera vista parecería obvio: el cliente debe retransmitir sólo si tiene un segmento pendiente sin confirmación de recepción al momento de enterarse de la falla. Sin embargo, una inspección más cercana revela dificultades con esta metodología ingenua. Considere, por ejemplo, la situación en la que la entidad de transporte del servidor envía primero una confirmación de recepción y luego, una vez que se envía esta confirmación de recepción, escribe en el proceso de aplicación. Escribir un segmento en el flujo de salida y enviar una confirmación de recepción son dos eventos diferentes que no se pueden hacer al mismo tiempo. Si ocurre una falla después de enviar la confirmación de recepción pero antes de que la escritura se complete, el cliente recibirá la confirmación de recepción y estará por ende en el estado \textit{S0} cuando llegue el anuncio de recuperación de la falla. Entonces el cliente no retransmitirá, pues pensará que llegó el segmento. Esta decisión del cliente provoca que falte un segmento.
+	
+	\par Podríamos pensar que todo lo que hay que hacer es reprogramar la entidad de transporte para que primero haga la escritura y luego envíe la confirmación de recepción. Imagine que se ha hecho la escritura pero que la falla ocurre antes de enviar la confirmación de recepción. El cliente se encontrará en el estado \textit{S1}, y por tanto retransmitirá, lo que provocará un segmento duplicado sin detectar en el flujo de salida que va al proceso de aplicación del servidor.
+
+	\par Sin importar cómo se programen el emisor y el receptor, siempre hay situaciones en las que el protocolo no se puede recuperar de manera apropiada. Podemos programar el servidor en una de dos formas: enviar confirmación de recepción primero o escribir primero. El cliente se puede programar en una de cuatro formas: siempre retransmitir el último segmento, nunca retransmitir el último segmento, retransmitir sólo en el estado \textit{S0} o retransmitir sólo en el estado \textit{S1}. Esto nos da ocho combinaciones pero, como veremos, para cada combinación existe cierto conjunto de eventos que hacen fallar al protocolo.
+
+	\par Son posibles tres eventos en el servidor: enviar una confirmación de recepción (A), escribir al proceso de salida (W) y fallar (C). Los tres eventos pueden ocurrir en seis órdenes diferentes: AC(W), AWC, C(AW), C(WA), WAC y WC(A), donde los paréntesis se usan para indicar que ni A ni W pueden ir después de C (es decir, una vez que el servidor falla, así se queda). En la figura 6-18 se muestran las ocho combinaciones de las estrategias de cliente y servidor, junto con las secuencias de eventos válidas para cada una. Observe que para cada estrategia hay alguna secuencia de eventos que provoca que el protocolo falle. Por ejemplo, si el cliente siempre retransmite, el evento AWC generará un duplicado no detectado, incluso aunque los otros dos eventos funcionen de manera apropiada.
+	
+	\begin{center}
+		\includegraphics[width=11cm, height=7cm]{./imagenes/fallas.png} 
+	\end{center}
+
+	\par Hacer más elaborado el protocolo no sirve de nada. Aunque el cliente y el servidor intercambien varios segmentos antes de que el servidor intente escribir, para que el cliente sepa con exactitud lo que está a punto de ocurrir, el cliente no tiene manera de saber si ha ocurrido una falla justo antes o justo después de la escritura. La conclusión es inevitable: según nuestra regla básica de que no debe haber eventos simultáneos (es decir, que eventos separados ocurren uno después de otro y no al mismo tiempo), la falla de un \textit{host} y su recuperación no pueden hacerse transparentes a las capas superiores.
+
+	\par Dicho en términos más generales, podemos replantear este resultado como “la recuperación de una falla en la \textit{capa N} se la se puede llevar a cabo en la \textit{capa N + 1}”, y esto es sólo si la capa superior retiene suficiente información del estado como para reconstruir la condición en la que se encontraba antes de que ocurriera el problema. Esto es consistente con el caso que mencionamos antes, en el que la capa de transporte puede recuperarse de fallas en la capa de red, siempre y cuando cada extremo de una conexión lleve el registro del estado en el que se encuentra.	
+	
+	\par Considere el caso de un usuario que introduce solicitudes de transacciones para una base de datos remota. Suponga que la entidad de transporte remota está programada para pasar primero los segmentos a la siguiente capa superior y luego emitir las confirmaciones de recepción. Incluso en este caso, el hecho de que la máquina de un usuario reciba una confirmación de recepción no significa necesariamente que el \textit{host} remoto se quedó encendido el tiempo suficiente como para actualizar la base de datos. Quizá es imposible lograr una verdadera confirmación de recepción de extremo a extremo, en donde si se recibe significa que en realidad se hizo el trabajo y, si no se recibe, significa que no se realizó el trabajo.
+
+\subsection{Control de congestión}
+
+	\par Como va bajando significativamente el precio de la memoria eventualmente se podrá equipar a los \textit{hosts} con tanta memoria que la falta de búferes dejará de ser un problema. Si el tamaño de búfer ya no limita el flujo máximo, aparecerá otro cuello de botella: la \textit{capacidad de carga de la subred}. Si enrutadores adyacentes pueden intercambiar como mucho \textit{X paquetes/seg} y hay \textit{K} trayectorias sin traslape entre un par de \textit{hosts}, no hay manera de que esos \textit{hosts} puedan intercambiar más de \textit{$K * X $  TPDUs/seg}, sin importar la cantidad de espacio de búfer disponible en cada terminal.
+
+	\par Si el emisor presiona demasiado (es decir, envía más que \textit{$K * X $  TPDU s/seg}), la subred se congestionará, pues será incapaz de entregar las TPDUs a la velocidad con que llegan. Lo que se necesita es un mecanismo basado en la capacidad de carga de la subred en lugar de la capacidad de almacenamiento en búfer del receptor. Es claro que el mecanismo de control de flujo debe aplicarse al emisor para evitar que estén pendientes demasiadas TPDUs sin confirmaciones de recepción al mismo tiempo.
+
+	\par Belsens propuso el uso de un esquema de control de flujo de ventana corrediza en el que el emisor ajusta dinámicamente el tamaño de la ventana para igualarla a la capacidad de carga de la red. Si la red puede manejar \textit{C segmentos/seg} y el tiempo de ciclo (incluidos transmisión, propagación, encolamiento, procesamiento en el receptor y devolución de la confirmación de recepción) es de \textit{R}, entonces la ventana del emisor debe ser de \textit{$C * R$}. Con una ventana de este tamaño, el emisor normalmente opera con el canal a su máxima capacidad. Cualquier pequeña disminución en el desempeño de la red causará que se bloquee.
+
+	\par A fin de ajustar periódicamente el tamaño de la ventana, el emisor podría vigilar ambos parámetros y calcular después el tamaño de ventana deseado. La capacidad de carga puede determinarse con solo contar la cantidad de segmentos confirmados durante algún período y dividirla entre el período. Durante la medición el emisor debe enviar a la mayor velocidad posible, para asegurarse que sea la capacidad de carga de la red, y no la baja tasa de entrada el factor limitante de la tasa de confirmaciones de recepción. El tiempo requerido para la confirmación de recepción de un segmento transmitido puede medirse exactamente y mantenerse una media de operación. Dado que la capacidad de la red depende de la cantidad de tráfico en ella, debe ajustarse el tamaño de la ventana con frecuencia para responder a los cambios en la capacidad de carga.
 
 \section{Los protocolos de transporte de internet: UDP}
 	\par Internet tiene dos protocolos principales en la capa de transporte, uno sin conexión y otro orientado a la conexión. Los protocolos se complementan entre sí. El protocolo sin conexión es UDP. Prácticamente no hace nada más que enviar paquetes entre aplicaciones, y deja que las aplicaciones construyan sus propios protocolos en la parte superior según sea necesario. El protocolo orientado a conexión es TCP. Hace casi todo. Realiza las conexiones y agrega confiabilidad mediante las retransmisiones, junto con el control de flujo y el control de congestión, todo en beneficio de las aplicaciones que lo utilizan.
@@ -1283,12 +1345,12 @@ Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos mil
 
 \subsection{Protocolos de transporte en tiempo real}
 
-	\par UDP también se utiliza en aplicaciónes de tiempo real como la radio en Internet, la telefonía en Internet, la música bajo demanda, las videoconferencias, el video bajo demanda y otras aplicaciones multimedia se volvían más comunes, las personas descubrieron que cada una de esas aplicaciones estaba reinventando más o menos el mismo protocolo de transporte de tiempo-real. Cada vez era más claro que tener un protocolo genérico de transporte en tiempo real para múltiples aplicaciones sería una excelente idea.
+	\par UDP también se utiliza en aplicaciónes de tiempo real como la radio en Internet, la telefonía en Internet, la música bajo demanda, las videoconferencias, el video bajo demanda y otras aplicaciones multimedia que se han vuelto más comunes. Las personas descubrieron que cada una de esas aplicaciones estaba reinventando más o menos el mismo protocolo de transporte de tiempo real. Cada vez era más claro que tener un protocolo genérico de transporte en tiempo real para múltiples aplicaciones sería una excelente idea.
 
 	\par A raíz de esto fue que nació el RTP (\textbf{Real-time Transport Protocol}), utilizado ampliamente para aplicaciones multimedia. RTP se ejecuta en espacio de usuario sobre UDP (en el sistema operativo). La aplicación multimedia consiste en múltiples flujos de audio, video, texto y quizás otros flujos. Éstos se colocan en la biblioteca RTP, la cual está en el espacio de usuario junto con la aplicación. Esta biblioteca multiplexa los flujos y los codifica en paquetes RTP, que después coloca en un socket. En el extremo del socket correspondiente al sistema operativo, se generan paquetes UDP para envolver los paquetes RTP y se entregan al IP para que los transmita a través de un enlace tal como Ethernet. En la figura 6-30(a) se muestra la pila de protocolos para esta situación. En la figura 6-30(b) se muestra el anidamiento de paquetes.
 	
 	\begin{center}
-		\includegraphics[width=11cm, height=7cm]{./imagenes/tiemporeal.png} 
+		\includegraphics[width=12cm, height=6cm]{./imagenes/tiemporeal.png} 
 	\end{center}
 
 \subsubsection{RTP: Protocolo de Transporte en Tiempo Real}
@@ -1297,22 +1359,20 @@ Ambos puntos son argumentos a favor de un pulso de reloj corto (unos cuantos mil
 		
 	\par A cada paquete enviado en un flujo RTP se le da un número más grande que a su predecesor. Esta numeración permite al destino determinar si falta algún paquete en cuyo caso, la mejor acción a realizar queda a criterio de la aplicación. Tal vez esta acción sea omitir una trama de video si los paquetes transportan datos de video, o aproximar el valor faltante mediante la interpolación en caso de que los paquetes transporten datos de audio. La retransmisión no es una opción práctica debido a la probabilidad de que el paquete retransmitido llegue muy tarde como para ser útil por lo que RTP no tiene confirmaciones de recepción ni ningún mecanismo para solicitar retransmisiones.
 
-	\par Las estampas de tiempo (\textit{timestamping}) son otra herramienta que muchas de las aplicaciones en tiempo real necesitan. La idea aquí es permitir que la fuente asocie una estampa de tiempo con la primera muestra de cada paquete. Las estampas de tiempo son relativas al inicio del flujo, por lo que sólo son importantes las diferencias entre dichas estampas. Como veremos en breve, este mecanismo permite que el destino haga un uso muy moderado del almacenamiento en búfer y reproduzca cada muestra el número exacto de milisegundos después del inicio del flujo, sin importar cuándo llegó el paquete que contiene la muestra.
+	\par Las estampas de tiempo (\textit{time stamping}) son otra herramienta que muchas de las aplicaciones en tiempo real necesitan. La idea aquí es permitir que la fuente asocie una estampa de tiempo con la primera muestra de cada paquete. Las estampas de tiempo son relativas al inicio del flujo, por lo que sólo son importantes las diferencias entre dichas estampas. Como veremos en breve, este mecanismo permite que el destino haga un uso muy moderado del almacenamiento en búfer y reproduzca cada muestra el número exacto de milisegundos después del inicio del flujo, sin importar cuándo llegó el paquete que contiene la muestra.
 	
 	\par En la figura 6-31 se ilustra el encabezado RTP, que consiste de tres palabras de 32 bits y potencialmente de algunas extensiones. La primera palabra contiene el campo \textit{Versión}, que es la 2.
 
 	\par El \textit{bit P} indica que el paquete se ha rellenado para formar un múltiplo de 4 bytes. El último byte de relleno indica cuántos bytes se agregaron. El \textit{bit X} indica que hay un encabezado de extensión. El formato y el significado de este encabezado no se definen. Lo único que se define es que la primera palabra de la extensión proporciona la longitud. Ésta es una puerta de escape para cualquier requerimiento imprevisto.
 
 	\begin{center}
-		\includegraphics[width=11cm, height=7cm]{./imagenes/tiemporeal.png} 
+		\includegraphics[width=10cm, height=6cm]{./imagenes/rt.png} 
 	\end{center}
 
-	\par El campo CC indica cuántas fuentes de contribución están presentes, de 0 a 15 (vea abajo). El bit M es un bit marcador específico de la aplicación. Puede utilizarse para marcar el inicio de una trama de video, el inicio de una palabra en un canal de audio o algo más que la aplicación entienda. El campo Tipo de car- ga útil indica cuál algoritmo de codificación se utilizó (por ejemplo, audio de 8 bits sin compresión, MP3, etc.). Puesto que cada paquete lleva este campo, la codificación puede cambiar durante la transmisión. El Número de secuencia es simplemente un contador que se incrementa con cada paquete RTP enviado. Se utiliza para detectar paquetes perdidos.
+	\par El campo \textit{ CC} indica cuántas fuentes de contribución están presentes, de 0 a 15. El \textit{bit M} es un bit marcador específico de la aplicación. Puede utilizarse para marcar el inicio de una trama de video, el inicio de una palabra en un canal de audio o algo más que la aplicación entienda. El campo \textit{Tipo de carga útil} indica cuál algoritmo de codificación se utilizó (por ejemplo, audio de 8 bits sin compresión, MP3, etc.). Puesto que cada paquete lleva este campo, la codificación puede cambiar durante la transmisión. El \textit{Número de secuencia} es simplemente un contador que se incrementa con cada paquete RTP enviado. Se utiliza para detectar paquetes perdidos.
 	
-	
-	
-	
-	
+	\par La fuente del flujo produce la \textit{Estampa de tiempo} para indicar cuándo se creó la primera muestra en el paquete. Este valor puede ayudar a reducir la variabilidad de la sincronización conocida como \textbf{variación del retardo} (\textit{jitter}) en el receptor, al desacoplar la reproducción del tiempo de llegada del paquete. El \textit{Identicador de origen} de sincronización indica a cuál flujo pertenece el paquete. Es el método utilizado para multiplexar y desmultiplexar varios flujos de datos en un solo flujo de paquetes UDP. Por último, los \textit{Identicadores de origen de contribución}, en caso de que haya, se utilizan cuando hay mezcladoras en el estudio. En ese caso, la mezcladora es el origen de la sincronización y los flujos que se mezclan se listan aquí.
+
 %FALTA control de congestion
 \section{Los protocolos de transporte de internet: TCP}
 
@@ -1552,6 +1612,57 @@ hasta \textit{Número de confrmación de recepción}$-$1.
 	\par Ambos extremos de una conexión TCP pueden enviar segmentos FIN al mismo tiempo. La recepción de ambos se confirma de la manera usual, y se apaga la conexión. De hecho, en esencia no hay diferencia entre la liberación secuencial o simultánea por parte de los hosts.
 	
 	\par Para evitar el problema de los dos ejércitos, se usan temporizadores. Si no llega una respuesta a un FIN en un máximo de dos tiempos de vida del paquete, el emisor del FIN libera la conexión. Tarde o temprano el otro lado notará que, al parecer, ya nadie lo está escuchando, y también expirará su temporizador. En la práctica, pocas veces ocurren problemas.
+	
+\subsection{Ventana deslizante de TCP}
+
+\subsubsection{Control de flujo en TCP}
+	
+	\par El campo \textbf{tamaño de ventana} en el encabezado TCP indica la cantidad de bytes que pueden enviarse comenzando por el byte cuya recepción se ha confirmado. Un campo de tamaño de ventana 0 indica que se han recibido los bytes hasta número de confirmación de recepción – 1, inclusive, pero que el receptor actualmente necesita un descanso y quisiera no recibir más datos por el momento. El permiso para enviar puede otorgarse después enviando un segmento con el mismo número de confirmación de recepción y un campo tamaño de ventana distinto de 0. Si la ventana anunciada por el receptor es de 0, el emisor debe detenerse hasta que el proceso de aplicación del \textit{host receptor} retire algunos datos del búfer en cuyo momento el TCP puede anunciar una ventana más grande.
+
+	\par Suponga que el receptor tiene un búfer de 4096 bytes, como se muestra en la figura 6-40. Si el emisor transmite un segmento de 2048 bytes que se recibe correctamente, el receptor enviará la confirmación de recepcioón del segmento. Sin embargo, dado que ahora sólo tiene 2048 bytes de espacio de búfer (hasta que la aplicación retire algunos datos de éste), anunciará una ventana de 2048 comenzando con el siguiente byte esperado.
+	
+	\begin{center}
+		\includegraphics[width=8cm, height=6cm]{./imagenes/flujotcp.png} 
+	\end{center}
+	
+	\par Ahora el emisor envía otros 2048 bytes, para los cuales el receptor envía la confirmación de recepción, pero la ventana anunciada tiene un tamaño de 0. El emisor debe detenerse hasta que el proceso de aplicación en el \textit{host receptor} retire algunos datos del búfer, momento en el que TCP podrá anunciar una ventana más grande y se podrán enviar más datos.
+
+	\par Cuando la ventana es de 0, el emisor por lo general no puede enviar segmentos, salvo en dos situaciones. En primer lugar, se pueden enviar \textbf{datos urgentes} (por ejemplo, para permitir que el usuario elimine el proceso en ejecución en la máquina remota). En segundo lugar, el emisor puede enviar un segmento de 1 byte para hacer que el receptor vuelva a anunciar el siguiente byte esperado y el tamaño de la ventana. TCP proporciona explícitamente esta opción para evitar un interbloqueo si llega a perderse una actualización de ventana.
+
+	\par No se requiere que los emisores transmitan datos tan pronto como llegan de la aplicación. Tampoco se requiere que los receptores envíen confirmaciones de recepción tan pronto como sea posible, ni que los receptores entreguen datos a la aplicación apenas los reciben. Por ejemplo, en la figura 6-40 cuando llegaron los primeros 2 KB de datos, TCP, a sabiendas que tenía disponible una ventana de 4 KB, hubiera actuado perfectamente bien si sólo almacenara en el búfer los datos hasta que llegaran otros 2 KB para transmitir un segmento con una carga útil de 4 KB. Podemos explotar esta libertad para mejorar el desempeño.
+	
+	\par Las confirmaciones de recepción se pueden enviar sólo después de haber recibido todos los datos hasta el byte confirmado. A esto se le conoce como \textbf{confirmación de recepción acumulativa}. Si el receptor recibe los segmentos 0, 1, 2, 4, 5, 6 y 7, puede enviar una confirmación de recepción de todos los bytes hasta el último byte del segmento 2, inclusive. Al expirar el temporizador del emisor, éste retransmitirá el segmento 3. Como el receptor ha puesto en el búfer los segmentos 4 a 7, al recibir el segmento 3 puede enviar una confirmación de recepción de todos los bytes hasta el final del segmento 7.	
+
+	\par El campo \textit{opciones} ofrece una forma de agregar características extra no cubiertas por el encabezado normal. La opción más importante es la que permite que cada \textit{host} especifique la carga útil TCP máxima que está dispuesto a aceptar. El uso de segmentos grandes es más eficiente que el de segmentos pequeños: el encabezado de 20 bytes puede amortizarse entre más datos. Durante el establecimiento de la conexión, cada lado puede anunciar su máximo y ver el de su compañero. Si un \textit{host} no usa esta opción, tiene una carga útil predeterminada de 536 bytes. Se requiere que todos los \textit{hosts} de internet acepten segmentos TCP de $ 536 + 20 = 556  bytes $. No es necesario que el tamaño de segmento en ambas direcciones sea el mismo.
+
+	\par En las líneas con alto ancho de banda, alto retardo o ambas cosas, la ventana de 64 KB con frecuencia es un problema. En una línea T3 (44.736 Mbps) se requieren solo 12 \textit{mseg} para enviar una ventana completa de 64 KB. Si el retardo de propagación de ida y vuelta es de 50 \textit{mseg} (típico de una fibra transcontinental), el emisor estará inactivo $3/4$ del tiempo en espera de confirmaciones de recepción.
+
+	\par Un tamaño de ventana más grande permitirá al emisor continuar enviando datos, pero como el campo de tamaño de ventana es de 16 bits, es imposible expresar tal tamaño. La solción es usar la opción de escala de ventana, para permitir al emisor y al receptor negociar un factor de escala de ventana. Este número da la posibilidad de que ambos lados desplacen el tamaño del campo de ventana hasta 14 bits a la izquierda, permitiendo por tanto ventanas de hasta $2^{30}$ bytes. La mayoría de las implementaciones actuales de TCP manejan esta opción.
+
+	\par Si el receptor recibe un segmento malo y luego una gran cantidad de segmentos buenos, el temporizador del protocolo TCP normal expirará en algún momento y se retransmitirán todos los segmentos sin confirmación de recepción, incluidos los que se recibieron correctamente. Se deben utilizar NAKs, para permitir que el receptor solicite un segmento/s específico/s. Tras recibirlo, puede enviar una confirmación de recepción de todos los datos que tiene en búfer, reduciendo de esta manera la cantidad de datos retransmitidos.
+
+\subsubsection{Política de Transmisión en TCP}
+
+	\par Considere una conexión a una terminal remota; por ejemplo, mediante el uso de SSH o telnet, que reacciona con cada pulso de tecla. En el peor de los casos, al llegar un carácter a la entidad TCP emisora, TCP crea un segmento TCP de 21 bytes que entrega al IP para que lo envíe como datagrama IP de 41 bytes. Del lado receptor, TCP envía de inmediato una confirmación de recepción de 40 bytes (20 bytes de encabezado TCP y 20 bytes de encabezado IP). Después, cuando la terminal remota lee el byte, TCP envía una actualización de ventana y recorre la ventana 1 byte hacia la derecha. Este paquete también es de 40 bytes. Por último, cuando la terminal remota procesa el carácter, lo retransmite para que se despliegue en forma local mediante un paquete de 41 bytes. En conjunto se usan 162 bytes de ancho de banda y se envían cuatro segmentos por cada carácter pulsado. Cuando el ancho de banda escasea, no es deseable este método de operación.
+	
+	\par Un enfoque que usa muchas implementaciones de TCP para optimizar esta situación es el de las confirmaciones de recepción con retardo. La idea es retrasar las confirmaciones de recepción y las actualizaciones de ventana por hasta 500 \textit{mseg}, con la esperanza de que lleguen algunos datos con los cuales se pueda viajar de manera gratuita. Suponiendo que la terminal hace eco en un lapso de 500 \textit{mseg}, ahora el lado remoto sólo necesita enviar de vuelta un paquete de 41 bytes, con lo cual se recorta a la mitad la cuenta de paquetes y el uso de ancho de banda.
+	
+	\par Aunque las confirmaciones de recepción con retardo reducen la carga impuesta en la red por el receptor, un emisor que envía varios paquetes cortos (por ejemplo, paquetes de 41 bytes que contengan 1 byte de datos) aún opera de manera ineficiente. El \textbf{algoritmo de Nagle} es una manera de reducir este uso. Lo que sugirió Nagle es sencillo: cuando llegan datos en pequeñas piezas al emisor, sólo se envía la primera pieza y el resto se almacena en búfer hasta que se confirma la recepción del byte pendiente. Después se envían todos los datos del búfer en un segmento TCP y nuevamente comienzan a almacenarse en búfer los datos hasta que se haya confirmado la recepción del siguiente segmento. Esto significa que sólo puede haber un paquete corto pendiente en cualquier momento dado. Si la aplicación envía muchas piezas de datos en el tiempo de ida y vuelta, el algoritmo de Nagle colocará todas las diversas piezas en un segmento, con lo cual se reducirá de manera considerable el ancho de banda utilizado. Además, el algoritmo establece que se debe enviar un nuevo segmento si se acumularon suficientes datos como para llenar un segmento máximo.
+	
+	\par Si el usuario escribe con rapidez y la red es lenta, puede entrar una cantidad importante de caracteres en cada segmento, reduciendo en gran medida el ancho de banda usado. A veces conviene inhabilitar el algoritmo de Nagle. En particular al operar una aplicación X-Windows a través de Internet, los movimientos del ratón tienen que enviarse a la computadora remota (X-Windows es el sistema de ventanas usado por la mayoría de los sistemas UNIX). Su acumulación para enviarlos en ráfagas hace que el movimiento del cursor sea errático, lo que no complace mucho a los usuarios.
+	
+	\begin{center}
+		\includegraphics[width=9cm, height=6cm]{./imagenes/ventana.png}
+	\end{center}
+
+	\par Otro problema que puede arruinar el desempeño de TCP es el \textbf{síndrome de ventana tonta} (Clark). Este problema ocurre cuando se pasan datos a la entidad TCP emisora en bloques grandes, pero una aplicación interactiva del lado receptor lee datos sólo a razón de 1 byte a la vez. Para ver el problema, analice la figura 6-41. En un principio, el búfer TCP del lado receptor está lleno y el emisor lo sabe (es decir, tiene un tamaño de ventana de 0). Entonces la aplicación interactiva lee un carácter del flujo TCP. Esta acción hace feliz al receptor TCP, por lo que envía una actualización de ventana al emisor para indicar que está bien que envíe 1 byte. El emisor accede y envía 1 byte. El búfer ahora está lleno, por lo que el receptor confirma la recepción del segmento de 1 byte y establece la ventana a 0. Este comportamiento puede continuar por siempre.
+
+	\par La solución de Clark es evitar que el receptor envíe una actualización de ventana para 1 byte. En cambio, se le obliga a esperar hasta tener disponible una cantidad decente de espacio, y luego lo anuncia. Específicamente, el receptor no debe enviar una actualización específica de ventana sino hasta que pueda manejar el tamaño máximo de segmento que anunció al establecerse la conexión, o hasta que su búfer quede a la mitad de capacidad, lo que sea más pequeño. Además, el emisor también puede ayudar al no enviar segmentos muy pequeños. En cambio, debe esperar hasta que pueda enviar un segmento completo, o por lo menos uno que contenga la mitad del tamaño del búfer del receptor.
+
+	\par El algoritmo de Nagle y la solución de Clark al síndrome de ventana tonta son complementarios. Nagle trataba de resolver el problema causado por la aplicación emisora que entregaba datos a TCP, 1 byte a la vez. Clark trataba de resolver el problema de que la aplicación receptora tomara los datos de TCP, 1 byte a la vez. Ambas soluciones son válidas y pueden operar juntas. El objetivo es que el emisor no envíe segmentos pequeños y que el receptor no los pida.
+
+	\par El receptor TCP también puede hacer más para mejorar el desempeño que sólo actualizar ventanas en unidades grandes. Al igual que el emisor TCP, tiene la capacidad de almacenar datos en el búfer, por lo que puede bloquear una solicitud READ de la aplicación hasta que pueda proporcionarle un bloque grande de datos. Al hacer esto se reduce la cantidad de llamadas a TCP (y la sobrecarga). También aumenta el tiempo de respuesta, pero en las aplicaciones no interactivas tales como la transferencia de archivos, la eficiencia puede ser más importante que el tiempo de respuesta a las solicitudes individuales.
+
 
 \subsection{Administración de temporizadores de TCP}
 
@@ -1609,6 +1720,60 @@ RTO, se establece así:
 	\par Un tercer temporizador que utilizan algunas implementaciones es el \textbf{temporizador de seguir con vida} (\textit{keepalive}). Cuando una conexión ha estado inactiva durante demasiado tiempo, el temporizador de seguir con vida puede expirar para ocasionar que un lado compruebe que el otro aún está ahí. Si no se recibe respuesta, se termina la conexión. Esta característica es controversial puesto que agrega sobrecarga y puede terminar una conexión saludable debido a una partición temporal de la red.
 
 \subsection{Control de congestión en TCP}
+
+	\par Cuando la carga ofrecida a cualquier red es mayor que la que puede manejar, se genera una congestión. Internet no es ninguna excepción. La capa de red detecta la congestión cuando las colas crecen demasiado en los enrutadores y trata de lidiar con este problema, aunque lo único que haga sea descartar paquetes. Es responsabilidad de la capa de transporte recibir la retroalimentación de congestión de la capa de red y reducir la tasa del tráfico que envía a la red. En Internet, TCP desempeña el papel principal en cuanto al control de la congestión, así como en el transporte confiable. Por esto se le considera un protocolo tan especial.
+	
+	\par El primer paso del manejo de congestión es su detección. La expiración de un temporizador causada por un paquete perdido podía deberse a ruido en la línea de transmisión o el descarte de paquetes en el enrutador congestionado.  Hoy en día la pérdida de paquetes por errores de transmisión es relativamente rara debido a que las troncales de larga distancia son de fibra (aunque las redes inalámbricas son otra historia). En consecuencia, la mayoría de las expiraciones de tiempo en Internet se deben a la congestión. Todos los algoritmos de congestión de TCP suponen que las expiraciones de tiempo son causados por congestión y las revisan en busca de problemas.
+	
+\subsubsection{¿Qué hace TCP para evitar la pérdida de segmentos?}
+
+	\begin{itemize}
+		\item  \underline{Solución 1:} al establecerse una conexión se tiene que seleccionar un tamaño de ventana adecuado. El receptor puede especificar una ventana con base en su tamaño de búfer. Si el emisor se ajusta a su tamaño de ventana, no ocurrirán problemas por desbordamiento de búferes en la terminal receptora, pero si podrán ocurrir en la red interna por su propia congestión. En la parte a) de la figura vemos un tubo grueso que conduce a un receptor de poca capacidad. Mientras el emisor no envíe más agua de la que puede contener la cubeta, no se perderá agua. En la parte b) de la figura el factor limitante no es la capacidad de la cubeta sino la capacidad de conducción interna de la red. Si entra demasiada agua a alta velocidad, ésta retrocederá, perdiéndose algo (en este caso, por el desbordamiento del embudo).
+
+	\begin{center}
+		\includegraphics[width=7cm, height=5cm]{./imagenes/sol1.png} 
+	\end{center}
+
+	\item \underline{Solución 2:} aceptar que existen dos problemas potenciales (capacidad de la red y capacidad del receptor) y manejarlos por separado. Para ello cada emisor mantiene dos ventanas:  la ventana que ha otorgado el receptor, y una segunda ventana, la ventana de congestión. Cada una refleja la cantidad de bytes que puede enviar el emisor. La cantidad de bytes que pueden enviarse es la cifra menor de las dos ventanas, por lo tanto, la ventana efectiva es el mínimo de lo que el emisor piensa que es correcto y lo que el receptor piensa que está bien. Si el receptor dice “envía a 8 KB” y el emisor sabe que las ráfagas de haste 32 KB pueden llegar sin problemas, envía los 8 KB solicitados.
+
+	\item \underline{Solución 3:} \textbf{Algoritmo de arranque lento} (Jacobson 1988). 	
+		\par Es requerido para todas las implementaciones de TCP. Al establecer una conexión el emisor asigna a la ventana de congestión el tamaño de segmento máximo usado por la conexión, entonces envía un segmento máximo. Si se recibe la confirmación de este segmento antes que expire el temporizador, el emisor agrega el equivalente en bytes de un segmento a la ventana de congestión para hacerla de dos segmentos de tamaño máximo y envía dos segmentos. A medida que se confirma cada uno de estos segmentos, se aumenta el tamaño de la ventana de congestión en un segmento máximo.
+	
+	\par Cuando la ventana de congestión es de \textit{N} segmentos, si de todos los \textit{N} se reciben confirmaciones de recepción a tiempo, se aumenta la ventana de congestión en la cuenta de bytes correspondiente a \textit{N} segmentos. De hecho, cada ráfaga confirmada duplica la ventana de congestionamiento. La ventana de congestión sigue creciendo exponencialmente hasta ocurrir una expiración del temporizador o alcanzar el tamaño de la ventana receptora. La idea es que si las ráfagas de 1024, 2048 y 4096 bytes funcionan bien, pero una ráfaga de 8192 produce una expiración del temporizador, la ventana de congestión debe establecerse a 4096 para evitar la congestión. Mientras el tamaño de la ventana de congestión permanezca en 4096, no se enviará una ráfaga de mayor longitud, sin importar el espacio de ventana otorgada por el receptor.
+
+	\par Recortar la ventana de congestión a la mitad porque hubo una expiración de temporizador y quedarse ahí, puede ser demasiado, porque puede ser que la red tenga una capacidad mayor a esa mitad y así se desaprovecharía esa capacidad de la subred. Comenzar arranque lento cada vez que expira un temporizador sería demasiado, y sería posible una recuperación mucho más rápida, al menos en la mayoría de los casos.
+
+	\item \underline{Solución 4:} \textbf{Algoritmo de control de congestión de Internet} (o TCP Talhoe).
+	
+		\par Utiliza un tercer parámetro, el \textbf{umbral}, inicialmente de 64 KB, además de las ventanas de recepción y congestión. Al ocurrir una expiración del temporizador, se establece un umbral en la mitad de la ventana de congestión actual, y la ventana de congestión se restablece a un segmento máximo. Luego se usa el arranque lento para determinar lo que puede manejar la red, excepto que el crecimiento exponencial termina al alcanzar el umbral. A partir de ese punto las transmisiones exitosas aumentan linealmente la ventana de congestión (en un segmento máximo por ráfaga) en lugar de uno por segmento. En efecto, este algoritmo está suponiendo que probablemente es aceptable recortar la ventana de congestión a la mitad, y luego aumentarla gradualmente a partir de ahí.
+
+	\par Si no ocurren más expiraciones de temporizador, la ventana de congestión continuará creciendo hasta el tamaño de la ventana del receptor. En ese punto dejará de crecer y permanecerá constante mientras no ocurran más expiraciones de temporizador y la ventana del receptor no cambie de tamaño. Notar cómo se baja la tasa de transferencia luego de un \textit{timeout}. Este método resuelve el problema 1 del arranque lento, pero no el problema 2.
+
+	\begin{center}
+		\includegraphics[width=7cm, height=5cm]{./imagenes/sol4.png} 
+	\end{center}
+
+	\par En la figura 37 el tamaño de segmento es de 1024 bytes. Inicialmente la ventana de congestón era de 64 KB, pero ocurre una expiración del temporizador, así que se establece el umbral a 32 KB y la ventana de congestión en 1 KB, para la transmisión 0. La ventana de congestión entonces crece exponencialmente hasta alcanzar el umbral (32 KB). A partir de entonces crece linealmente. La transmisión 13 tiene mala suerte y ocurre una expiración del temporizador. Se establece el umbral en la mitad de la ventana actual (ahora de 40 KB, por lo que la mitad es de 20 KB), e inicia de nuevo el arranque lento. Al llegar las confirmaciones de recepción de la transmisión 14, los primeros 4 incrementan la ventana de congestión en un segmento máximo, pero después de eso el crecimiento se vuelve lineal nuevamente.
+
+	\item \underline{Solución 5:} \textbf{Algoritmo de TCP Reno}.
+	\par Evitar arranque lento (excepto cuando la conexión es comenzada) cuando expira el temporizador de reenvíos. Luego de iniciada la conexión se comienza con arranque lento. A continuación la ventana de congestión crece linealmente hasta que se detecta una pérdida de paquete. El paquete perdido es retransmitido y se usa recuperación rápida. Luego la ventana de congestión de una conexión se achica a la mitad durante un RTT (\textit{decrecimiento multiplicativo}) y luego la ventana de congestión va incrementando de a un segmento por cada RTT (\textit{crecimiento aditivo}). Este comportamiento continua indefinidamente. Luego se hicieron ajustes menores a TCP Reno.
+
+	\begin{center}
+		\includegraphics[width=7cm, height=5cm]{./imagenes/sol5.png} 
+	\end{center}
+
+	\end{itemize}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
