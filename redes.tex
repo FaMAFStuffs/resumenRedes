@@ -16,11 +16,13 @@
 \tableofcontents
 
 \chapter{INTRODUCCIÓN}
-\par Una red de computadoras es un conjunto de computadoras autónomas 
+
+	\par Una red de computadoras es un conjunto de computadoras autónomas 
 interconectadas. Dos computadoras están interconectadas si pueden intercambiar 
 información. La conexión puede hacerse por medio de: cable de cobre, fibra óptica, 
 microondas, rayos infrarrojos, satélites de comunicaciones, etc.
-\par Si bien los tipos de redes no cambian, si evoluciona la tecnología de hardware en 
+
+	\par Si bien los tipos de redes no cambian, si evoluciona la tecnología de hardware en 
 la que se basa, y como consecuencia el funcionamiento o desempeño de las redes de 
 cada tipo van mejorando más y más.
 
@@ -825,7 +827,6 @@ La esencia del problema consiste en que cuando X indica Xi a E, E no tiene forma
 \subsection{Protocolos de control de Internet}
 
 
-%LIsta
 \subsubsection{ARP: Protocolo de Resolución de Direcciones}
 
 	\par Aunque en internet una máquina tiene una o más direcciones IP, estas no pueden usarse para enviar paquetes debido a que el hardware de la capa de enlace de datos no entiende las direcciones de internet. Hoy día la mayoría de los hosts de las compañías y las universidades se une a una LAN por una tarjeta de red que solo entiende direcciones LAN. Por ejemplo cada tarjeta Ethernet viene provista de fábrica con una dirección Ethernet de 48 bits, las tarjetas envían y reciben tramas basadas en direcciones Ethernet de 48 bits pero no saben nada de direcciones IP.
@@ -856,7 +857,6 @@ La esencia del problema consiste en que cuando X indica Xi a E, E no tiene forma
 	
 	\par Cuando la placa de red de Ethernet del enrutador recibe esta trama, entrega el paquete al software IP. Sabe con base en las máscaras de red que el paquete se debe enviar a la red IE, en donde alcanzará al \textit{host 4}. Si el enrutador no conoce la dirección Ethernet para el \textit{host 4}, entonces usará ARP de nuevo. Las direcciones Ethernet cambian con la trama en cada red, mientras que las direcciones IP permanecen constantes (puesto que indican las terminales a través de todas las redes interconectadas).
 	
-%Lista
 \subsection{OSPF: un protocolo de enrutamiento de puerta de enlace interior}
 	\par Internet se compone de una gran cantidad de \textbf{Sistemas Autónomos}. Cada uno de ellos es manejado por una organización diferente y puede usar su propio algoritmo interno de enrutamiento. Un algoritmo de enrutamiento dentro de un sistema autónomo se llama \textbf{protocolo de puerta de enlace interior (IGP)}; un algoritmo para enrutamiento entre sistemas autónomos se llama protocolo de \textbf{puerta de enlace exterior (EGP)}.
 
@@ -907,17 +907,15 @@ para la red en sí, más un nodo para cada enrutador. Los arcos desde el nodo de
 
 
 \subsection{BGP: el protocolo de enrutamiento de Puerta de Enlace Exterior}
-	\par Los enrutadores de protocolo de puerta de enlace exterior tienen que 
-	preocuparse en gran parte por la política. Muchas veces se quiere mantener las 
-	políticas privadas; porque los Sistemas Autónomos (SA) compiten entre sí (ej: PSI 
-	competidores).	
-	\par Las políticas típicas implican consideraciones políticas, de seguridad, o 
-	económicas. Algunos ejemplos de posibles restricciones de enrutamiento son:
+	
+	\par Dentro de un solo sistema autónomo, OSPF e IS-IS son los protocolos de uso común. Entre los sistemas autónomos se utiliza un protocolo diferente, conocido como BGP (\textit{Border Gateway Protocol}). Los protocolos de enrutamiento interdominio tienen que preocuparse en gran manera por la política.
+	
+	\par Los protocolos de puerta de enlace exterior (y BGP en particular) se han diseñado para permitir que se implementen muchos tipos de políticas de enrutamiento en el tráfico entre sistemas autónomos. Las políticas típicas implican consideraciones políticas, de seguridad, o económicas. Algunos ejemplos de posibles restricciones de enrutamiento son:
 		\begin{enumerate}
 			\item  No transportar tráfico comercial en la red educativa.
 			\item Nunca enviar tráfico del Pentágono por una ruta a través de Irak.
 			\item Usar TeliaSonera en vez de Verizon porque es más económico.
-			\item No usar AT and T en Australia porque el desempeño es pobre.
+			\item No usar AT \& T en Australia porque el desempeño es pobre.
 			\item El tráfico que empieza o termina en Apple no debe transitar por Google.
 		\end{enumerate}
 
@@ -932,15 +930,152 @@ para la red en sí, más un nodo para cada enrutador. Los arcos desde el nodo de
 	deseado que es libre de ciclos. Además los caminos deben respetar las políticas de 
 	los SA a lo largo del camino. Donde una política significan reglas que se refieren a 
 	preferencias de enrutamiento y a limitaciones de enrutamiento.
-   \par Los PPEE suelen implementarse sobre enrutadores de borde de sistema 
+   
+	\par Los PPEE suelen implementarse sobre enrutadores de borde de sistema 
    autónomos (EBSA), los cuales tienen que hacer una elección de varias rutas a un 
    destino; va a elegir la mejor de acuerdo con sus propias políticas locales y esta va a 
    ser la ruta que avisa. Además le dice a sus vecinos para cada destino, el camino 
    exacto que está usando.
+   
 	\par Muchos PSI existen solo para proveer servicios a consumidores (ej: redes 
 	hogareñas). Otros PSI ofrecen algo parecido a un servicio dorsal interconectando 
 	otros PSI y a veces grandes corporaciones. A menudo varios proveedores se 
 	conectan entre sí como un punto único de compañerismo.
+	
+	\par \textbf{Relación proveedor-consumidor:} Una política común es que un PSI paga a otro PSI para entregar paquetes a otros destinos en la internet y recibir paquetes enviados de otros destinos. El PSI cliente se dice que compra servicio de tránsito del PSI proveedor y debe dar publicidad de rutas (a todos los destinos en internet) al cliente sobre el enlace que lo conecta. De este modo, el cliente va a tener una ruta para usar para enviar paquetes para todos lados. El PSI cliente debe publicar rutas (a los destinos en su red) al PSI proveedor. Esto va a permitir al proveedor enviar tráfico al cliente solo para esas direcciones.
+
+	\par Cuando dos SA mandan tráfico directamente entre sí en forma gratuita, a esta política se la llama compañerismo.
+	
+	\par \textbf{Relación de compañerismo:} Para lograr esto los dos SA mandan publicidad de enrutamiento de uno al otro para las direcciones que residen en sus redes. El compañerismo no es transitivo.
+
+	\par Algunos PSI están conectados a varios PSI, esta técnica (llamada \textit{multihoming}) es usada para mejorar la confiabilidad, por si el camino por uno de los PSI falla.
+
+
+Protocolos de Puerta de Enlace Exterior
+•Propósito: entender los roles que pueden cumplir los SA.
+•Tráfico local: tráfico que se origina y termina en nodos dentro de un SA.
+•Tráfico de tránsito: tráfico que pasa a través de un SA.
+•Los SA se agrupan en categorías:
+–SA bastón (stub): tienen solo una conexión con el grafo de BGP. No se pueden usar para transportar tráfico porque no hay nadie en el otro lado.
+–SA multi-homed: un SA que tiene una conexión a más de un SA pero que rechaza llevar tráfico de tránsito.
+–SA multi-conectadas: se pueden usar para el transporte de tráfico excepto que lo rechacen.
+–SA de tránsito: (como redes dorsales) están dispuesta a ocuparse de paquetes de terceros, posiblemente con algunas restricciones, y normalmente por pago.
+
+	\par Entre los sistemas autónomos se puede usar el protocolo de puerta de enlace de frontera (BGP). Cada SA pueede usar el protocolo interno que desee (Ej: OSPF). BGP se ha diseñado para permitir que se implementen muchos tipos de políticas de enrutamiento en el tráfico entre sistemas autónomos. Las políticas típicas implican consideraciones políticas, de seguridad, o económicas. BGP no hace ninguna suposición acerca de como los SA están interconectados. Estos forman un grafo arbitrario.
+
+Las políticas en cada enrutador de BGP (EBSA) se configuran manualmente. No son parte del protocolo.
+\par Desde el punto de vista de un enrutador de BGP el mundo consiste de sistemas autónomos y las líneas que los conectan. Dos sistemas autónomos se consideran conectados si cada uno contiene un enrutador fronterizo con una línea hacia afuera del sistema autónomo. Una política de enrutamiento es implementada decidiendo qué tráfico puede fluir sobre cuáles enlaces entre SAs.
+
+	\par Un enrutador de frontera de SA (EBSA) tiene la tarea de enviar paquetes entre SAs. BGP corre arriba de TCP. Los pares de enrutadores BGP se comunican entre sí estableciendo conexiones TCP. Proporcionan comunicación confiable y ocultan todo detalle de red que pase a través de ellos.
+
+	\par BGP avisa de caminos completos como una lista enumerada de SA para alcanzar una red particular. Estos avisos hacen falta para para detectar ciclos en el enrutamiento y para permitir las decisiones políticas. A los SA se les puede dar números como nombre.
+Si un enrutador BGP (EBSA) tiene una elección de varias rutas a un destino, va a elegir la mejor de acuerdo con sus propias políticas locales y esta va a ser la ruta que avisa. Un enrutador BGP no tiene obligación de avisar una ruta a un destino, incluso si tiene una.
+Así un SA puede implementar una política de no proveer tránsito, refutando el anuncio de rutas a prefijos que no están contenidos dentro del SA.
+
+	\par Comprender cómo sucede la adaptación a cambios en la topología y en las políticas. Como los enlaces fallan y las políticas cambian, los enrutadores BGP necesitan poder cancelar caminos previamente avisados. Sino los enrutadores BGP van a tener y trabajar con información que ya no sirve o van a violar políticas. Esto se logra con un aviso conocido como ruta removida.
+
+	\par BGP en cada enrutador para cada destino guarda el registro de la ruta utilizada. El camino consiste del siguiente enrutador de salto (que puede estar en el otro lado del PSI, no adyacente) y la secuencia de SAs que la ruta ha seguido (dada en orden reverso). Cada enrutador de BGP les dice a sus vecinos para cada destino el camino exacto que está usando. Un enrutador que quiere un camino para el destino D, recibe de sus vecinos rutas a D y entre ellas elige la mejor. La regla es que cada enrutador que envía una ruta afuera del SA coloca su propio número de SA en la ruta. Esto explica el porqué la lista está en orden reverso. Llevar el camino completo con la ruta hace fácil para el enrutador receptor detectar y romper ciclos. Cuando un enrutador recibe una ruta la chequea para ver si su propio número de SA ya está en el camino de SAs. Si es así, se ha detectado un ciclo y la publicidad se descarta. Dar una lista de SA es una manera muy gruesa de especificar un camino.
+
+	\par En la siguiente figura hay una red corriendo BGP. Asumimos que los proveedores son redes de tránsito y los clientes son bastones. Un enrutador BGP de SA proveedor A (SA 2) va a poder avisar información de alcanzabilidad para cada uno de los números de red asignados a clientes P y Q. 
+•Así va a decir: “las redes 128.96, 192.4.153, 192.4.32, and 192.4.3 pueden ser alcanzadas dierctamente de SA 2”.
+•La red dorsal, al recibir estos avisos puede avisar: “las redes 128.96, 192.4.153, 192.4.32, and 192.4.3 pueden ser alcanzadas a lo largo del camino (SA 1, SA 3)”
+
+	\par La red de la siguiente figura difiere de la anterior solo en el enlace extra entre SA 2 y SA 3, pero el efecto ahora es que el grafo del SA tiene un ciclo en él.
+Supongamos que SA 1 aprende que puede alcanzar red 128.96 a través de SA 2, así que avisa este hecho a SA 3, que lo avisa a AS 2.
+
+El aviso para el camino a 128.96 recibido por SA 2 de SA 3 va a contener un camino (SA 3, SA 1, SA 2, SA 4), SA 2 se ve a sí mismo en el camino y concluye que este no es un camino útil para usar.
+
+
+Por que esa es la función de los enrutadores, enrutar hacia destinos en su SA y hacia los destinos permitidos (respetando políticas) que están en otros SA.
+\par Estrategia: Para resolver el problema haremos un análisis por casos.
+•Caso 1: En el caso de un SA bastón que solo conecta a otros SA en un punto simple, el EBSA es la única elección para todas las rutas que están afuera del SA. Tal enrutador puede inyectar una ruta default en el protocolo de enrutamiento intra SA.
+
+•Caso 2: El siguiente paso en complejidad es tener EBSA que inyecten rutas específicas que ha aprendido de afuera del SA. Ejemplo: Supongamos que un EBSA de un SA proveedor se conecta con un SA cliente. Ese EBSA podría aprender que el prefijo p de red es localizado dentro del SA cliente. Ese EBSA podría inyectar una ruta a p en el protocolo de enrutamiento del SA proveedor. Podría ser un aviso del tipo “tengo un link a p de costo X”. Esto causaría que otros enrutadores en el SA proveedor puedan aprender que este EBSA es el lugar para enviar paquetes a p.
+
+
+
+
+BGP
+•Problema: Los SAs dorsales aprenden tanta información de enrutamiento de un enrutador BGP que se convierte en demasiado caro inyectarla en el protocolo intra SA.
+–Ejemplo: si el EBSA quiere inyectar 10.000 prefijos que ha aprendido de otro SA, va a tener que enviar paquetes de estado de enlace muy grandes a los otros enrutadores en ese SA y los cálculos de caminos más cortos van a ser muy costosos.
+•Problema: ¿cómo hacer para que los enrutadores internos a un SA dorsal no tengan que procesar tanta información proveniente de otros SA para calcular sus tablas de enrutamiento?
+
+
+
+
+BGP
+•Solución: los enrutadores en una SA dorsal usan una variante de BGP llamada interior BGP (iBGP) para redistribuir efectivamente la información que ha aprendido por los enrutadores BGP en los arcos de los SA a todos los demás enrutadores del SA.
+–iBGP permite a cada enrutador en el SA aprender el mejor EBSA para usar cuando envía un paquete a cualquier dirección.
+–Al mismo tiempo, cada enrutador en el SA mantiene la pista de cómo ir a cada EBSA usando un protocolo convencional intra SA sin información inyectada.
+–Combinando estos dos conjuntos de información cada enrutador en el SA puede determinar el salto próximo apropiado para todos los prefijos.
+
+
+
+
+BGP
+•La tabla arriba a la izquierda de la siguiente figura muestra la información que el enrutador B aprende de sus sesiones iBGP. Aprende que algunos prefijos son mejor alcanzados por el enrutador A, otros vía D y algunos vía E (ver SA de figura anterior).
+•Al mismo tiempo todos los enrutadores en el SA ejecutan OSPF y del mismo B aprende cómo alcanzar otros nodos dentro del dominio, como se ve en la tabla de arriba a la derecha.
+•Finalmente en la tabla de abajo, B pone el cuadro completo combinando la información acerca de prefijos externos aprendidos de iBGP con la información acerca de rutas internas a los enrutadores de borde aprendida de OSPF.
+
+
+
+
+BGP
+•Propósito: Entender cómo los enrutadores BGP eligen cuál ruta usar para cada destino.
+–Puede haber varias rutas a un destino, unas mejores y otras peores.
+–Por ende es una necesidad cuál de ellas usar.
+•Problema: ¿cómo los enrutadores BGP eligen cuál ruta usar para cada destino?
+–Cada enrutador BGP puede aprender una ruta para un destino dado del enrutador con el cual está conectado en el próximo PSI y de todos los otros enrutadores frontera (los cuales han escuchado diferentes rutas de los enrutadores con los cuales están conectados en otros PSI).
+–Cada enrutador debe decidir cuál ruta en este conjunto de rutas es la mejor a usar.
+–Está a cargo del PSI escribir alguna política para recolectar la ruta preferida.
+–Vamos a describir algunas estrategias comunes.
+
+
+
+BGP
+•Estrategia 1: Las rutas vía redes compañeras se eligen en preferencia a las rutas vía proveedores de tránsito.
+•Estrategia 2: A las rutas del cliente se les da la mayor preferencia.
+•Estrategia 3: (regla por default) caminos SA más cortos son mejores.
+•Estrategia 4: es preferible la ruta que tiene el costo más corto dentro del PSI.
+
+
+BGP
+•Cada enrutador BGP contiene un módulo que examina las rutas a un destino dado y las califica, devolviendo un número para la “distancia” a ese destino por cada ruta.
+–Cualquier ruta que viole una restricción de la política recibe automáticamente una calificación al infinito.
+–Entonces el enrutador adopta la ruta de la distancia más corta al destino.
+–La función de calificar no es parte del protocolo de BGP y la fija el administrador del sistema.
+
+
+
+BGP
+•Ahora damos algunos detalles importantes adicionales de la implementación de BGP.
+•Cada enrutador BGP mantiene una base de datos de redes que puede alcanzar y la ruta preferida para alcanzar cada red.
+•Cuando se hace un cambio a esta base de datos, el enrutador BGP construye un mensaje de actualización (update) que es difundido a todos los otros enrutadores implementando BGP.
+–De este modo todos los enrutadores BGP pueden construir y mantener su información de enrutamiento.
+
+
+BGP
+•El mensaje de actualización comunica dos tipos de información:
+–Información acerca de una ruta simple a través de la internet.
+•La misma está disponible para ser agregada en la base de datos de todo enrutador BGP receptor.
+–Una lista de rutas previamente avisadas por este enrutador que ya no son más válidas.
+•Un mensaje de actualización puede contener ambos o uno de esos tipos de información.
+
+
+BGP
+•La información acerca de una ruta simple consiste de los siguientes campos:
+–Lista de identificadores de las redes que pueden ser alcanzadas por esa ruta.
+•El identificador de una red es su dirección IP, que es una porción de una dirección IP completa.
+–Los atributos del camino
+•Lista de SAs que son recorridos por esa ruta, dirección IP del EBSA que se va a usar como próximo salto a los destinos del campo anterior
+
+
+
+BGP
+•Para dar la lista de rutas previamente avisadas a cancelar, basta con identificar cada una de esas rutas con la dirección IP de una red de destino.
+
+
+
 
 
 \chapter{LA CAPA DE TRANSPORTE}
