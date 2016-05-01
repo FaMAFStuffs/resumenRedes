@@ -693,21 +693,15 @@ en general.
 La esencia del problema consiste en que cuando X indica Xi a E, E no tiene forma de saber si el destino i está en alguna ruta en funcionamiento.
 
 \subsection{Enrutamiento por estado del enlace}
+	
 	\par La idea detrás del enrutamiento por estado del enlace es bastante simple y 
 	se puede enunciar en cinco partes. Cada enrutador debe realizar lo siguiente para 
 	hacerlo funcionar:
 
 	\begin{enumerate}
-		\item Descubrir a sus vecinos y conocer sus direcciones de red: esto lo realiza 
-		enviando un paquete HELLO especial a cada línea punto a punto. Se espera que 
-		el 	enrutador del otro extremo regrese una respuesta indicando quién es. Estos
-		nombres deben ser globalmente únicos.
+		\item \underline{Descubrir a sus vecinos y conocer sus direcciones de red:} esto lo realiza enviando un paquete HELLO especial a cada línea punto a punto. Se espera que el 	enrutador del otro extremo regrese una respuesta indicando quién es. Estos nombres deben ser globalmente únicos.
 
-		\item Establecer la métrica de distancia o de costo para cada uno de sus vecinos:
-		el AEEE requiere que cada enrutador tenga una idea razonable del retardo a cada 
-		uno de sus vecinos. Una forma de determinarlo es enviar un paquete ECHO 
-		especial a través de la línea, una vez que llegue al otro extremo, éste debe 
-		regresarlo inmediatamente.
+		\item \underline{Establecer la métrica de distancia o de costo para cada uno de sus vecinos:} el AEEE requiere que cada enrutador tenga una idea razonable del retardo a cada uno de sus vecinos. Una forma de determinarlo es enviar un paquete ECHO especial a través de la línea, una vez que llegue al otro extremo, éste debe regresarlo inmediatamente.
 
 		\par Si se mide el tiempo de ida y vuelta y se divide por $2$, el enrutador emisor 
 		puede tener una idea razonable del retardo. Pero esto tiene un problema, ya que 
@@ -725,45 +719,139 @@ La esencia del problema consiste en que cuando X indica Xi a E, E no tiene forma
 		Desgraciadamente también hay un argumento en contra de la inclusión de la carga 
 		en el cálculo del retardo.
 
-		\item Construir un paquete que indique todo lo que acaba de aprender: Cada 
-		enrutador construye un paquete des estado de enlace (LSP) que contiene todos 
-		los datos:
+		\item \underline{Construir un paquete que indique todo lo que acaba de aprender:} Cada enrutador construye un \textbf{paquete de estado} de enlace (LSP) que contiene todos los datos:
 		\begin{itemize}
 			\item Identidad del emisor
 			\item Numero de secuencia
 			\item Edad
 			\item Lista de (vecino, retardo al vecino)
 		\end{itemize}
+		
+		\textbf{Ejemplo:}
+		\begin{center}
+			\includegraphics[width=12cm, height=5cm]{./imagenes/estado.png} 
+		\end{center}
 
-		\par los paquetes deben ser construirlos de manera periódica, es decir, a 
+		\par Los paquetes deben ser construirlos de manera periódica, es decir, a 
 		intervalos regulares o cuando ocurra un evento significativo, como la caída o la 
 		reactivación de la línea o de un vecino, o el cambio apreciable de sus propiedades.
 
-		\item Enviar este paquete a todos los demás enrutadores y recibir paquetes de 		
-		ellos: la parte más complicada del algoritmo es la distribución confiable de los 
-		paquetes de estado del enlace.
+		\item\underline{ Enviar este paquete a todos los demás enrutadores y recibir paquetes de ellos:} la parte más complicada del algoritmo es la distribución confiable de los  paquetes de estado del enlace.
 		
-		\par La idea fundamental es usar inundación para distribuir los paquetes de 
-		estado 
-		del enlace, llevando un registro de los paquetes difundidos. A fin de mantener 
-		controlada la inundación, cada paquete contiene un número de secuencia que se 
-		incrementa con cada paquete nuevo enviado (desde su enrutador de origen).
-		\par Los enrutadores llevan el registro de todos los pares (enrutador de origen, 
-		secuencia) que ven. Para cada enrutador de origen el paquete recibido con 
-		número de secuencia más grande es el que importa, los anteriores no.
+		\par La idea fundamental es utilizar inundación para distribuir los paquetes de estado del enlace a todos los enrutadores. Con el fin de mantener controlada la inundación, cada paquete contiene un número de secuencia que se incrementa con cada nuevo paquete enviado. Los enrutadores llevan el registro de todos los pares (enrutador de origen, secuencia) que ven. Cuando llega un nuevo paquete de estado del enlace, se verifica y compara con la lista de paquetes ya vistos. Si es nuevo, se reenvía a través de todas
+las líneas, excepto aquella por la que llegó. Si es un duplicado, se descarta. Si llega un paquete con número de secuencia menor que el mayor visto hasta el momento, se rechaza como obsoleto debido a que el enrutador tiene datos más recientes.
 
-		\item Calcular la ruta más corta a todos los demás enrutadores.
+		\par Este algoritmo tiene algunos problemas, pero son manejables. Primero, si los números de secuencia vuelven a comenzar, reinará la confusión. La solución aquí es utilizar un número de secuencia de 32 bits. Con un paquete de estado del enlace por segundo, el tiempo para volver a empezar será de 137 años, por lo que podemos ignorar esta posibilidad.
+
+		\par Segundo, si llega a fallar un enrutador, perderá el registro de su número de secuencia. Si comienza nuevamente en 0, se rechazará como duplicado el siguiente paquete que envíe. Cuando se actualicen las tablas de enrutamiento y se manden los paquetes HELLO, se puede detectar que el enrutador está caído.
+
+		\par Tercero, si llega a corromperse un número de secuencia y se recibe 65540 en vez de 4 (un error de 1 bit), los paquetes 5 a 65540 se rechazarán como obsoletos, dado que se piensa que el número de secuencia actual es 65540.
+		
+		\par La solución a todos estos problemas es incluir la edad de cada paquete después del número de secuencia y disminuirla una vez cada segundo. Cuando la edad llega a cero, se descarta la información de ese enrutador.
+
+		\par Algunos refinamientos a este algoritmo pueden hacerlo más robusto. Una vez que llega un paquete de estado del enlace a un enrutador para ser inundado, no se encola para su transmisión de inmediato, sino que se coloca en un área de almacenamiento para esperar un tiempo corto, en caso de que se activen o desactiven más enlaces. Si llega otro paquete de estado del enlace proveniente del mismo origen antes de que se transmita el primer paquete, se comparan sus números de secuencia. Si son iguales, se descarta el duplicado. Si son diferentes, se desecha el más antiguo.
+
+		\par El \textbf{buffer de paquetes para un enrutador} contiene una celda por cada paquete de estado de enlace recién llegado, pero aún no procesado por completo. Una fila de la tabla del búfer de paquetes de un enrutador contiene: Origen del paquete, número de secuencia, edad, datos de los estados de enlaces. Banderas que pueden ser:
+
+		\begin{itemize}
+			\item \textbf{Banderas de confirmación de recepción:} indica a dónde tiene que enviarse la confirmación de recepción del paquete.
+			\item \textbf{Banderas de envío:} significan que el paquete debe enviarse a través de las líneas indicadas.
+			\item Si llega un duplicado mientras el original aún esta en el búfer, los bits de las banderas tienen que cambiar.
+		\end{itemize}
+		
+		\begin{center}
+			\includegraphics[width=9cm, height=4cm]{./imagenes/eenlace.png} 
+		\end{center}
+
+		\item \underline{Calcular la ruta más corta a todos los demás enrutadores:} una vez que el enrutador ha acumulado un grupo completo de paquetes de estado del enlace, puede construir el grafo de la subred completa. Cada enlace se representa dos veces, una para cada dirección. Los dos valores pueden promediarse o usarse por separado. Luego se ejecuta localmente el algoritmo de Dijkstra para construir la ruta más corta a todos los destinos posibles. Los resultados de este algoritmo pueden instalarse en las tablas de enrutamiento, y la operación normal puede reiniciarse.
+
+		\par  A medida que la subred crece en decenas de miles o cientos de miles de nodos, la probabilidad de falla ocasional de un enrutador deja de ser insignificante. El algoritmo por estado de enlace se usa ampliamente en las redes actuales.
 	\end{enumerate}
 
-
-
 \subsection{Enrutamiento jerárquico}
-\subsection{Enrutamiento por difusión}
+
+	\par A medida que crece el tamaño de las redes, también lo hacen en forma proporcional las tablas de enrutamiento del enrutador. Las tablas que están en crecimiento constante no sólo consumen memoria del enrutador, sino que también se necesita más tiempo de CPU para examinarlas y más ancho de banda para enviar informes de estado entre enrutadores. La subred puede crecer hasta el punto en que ya no sea viable que cada enrutador tenga una entrada para cada uno de los demás enrutadores.
+	
+	\par Cuando se utiliza el enrutamiento jerárquico, los enrutadores se dividen en lo que llamaremos regiones. Cada enrutador conoce todos los detalles para enrutar paquetes a destinos dentro de su propia región, pero no sabe nada de la estructura interna de las otras regiones. 
+	
+	\par Resolver este problema es necesario porque las WAN suelen ser enormes
+y también lo es la internet. Sin resolver este problema solo se podrían tener varias WAN chicas o medianas sin interconectarlas entre sí. El hacerlo permite tener dentro de una WAN enorme, redes enormes para grandes empresas (corporaciones) o instituciones públicas (grandes universidades, gobiernos, etc.) y considerar todas las redes del mundo como una única intered gigante.
+
+	\par En las redes enormes, tal vez no sea suficiente una jerarquía de dos niveles; puede ser necesario agrupar las regiones en clústeres, los clústeres en zonas, las zonas en grupos, etc, hasta que se nos agoten los nombres para clasificarlos.
+	
+	\par Si el enrutador es jerárquico, en su tabla de enrutamiento hay:
+		\begin{itemize}
+			\item Entradas para todos los enrutadores locales.
+			\item Entradas para las las demás regiones en las que no está el enrutador.
+		\end{itemize}
+	
+	\par El precio que se paga con enrutamiento jerárquico es una longitud de ruta mayor.
+
+	\begin{center}
+			\includegraphics[width=9cm, height=6cm]{./imagenes/jerarquico.png} 
+	\end{center}
+
 \section{Algoritmos de control de congestión}
+
+	\par Cuando la cantidad de paquetes descargados en la subred por los \textit{hosts} está dentro de su capacidad de conducción, la cantidad de paquetes entregados es proporcional al número enviado. Cuando hay demasiados paquetes presentes en la subred (o en una parte de ella) hay una degradación del desempeño. Esta situación se llama \textbf{congestión}.
+
+	\par A medida que aumenta el tráfico, llega un punto en que los enrutadores ya no pueden manejarlo y comienzan a perder paquetes. Con mucho tráfico el desempeño se desploma por completo y casi no hay entrega de paquetes.
+
+	\par Si comienzan a llegar muchos paquetes por algunas líneas de entrada y todas necesitan la misma línea de salida. Se generará una cola. Si no hay suficiente memoria para almacenar todos los paquetes, algunos de ellos se perderán.
+	
+	\begin{center}
+			\includegraphics[width=8cm, height=5cm]{./imagenes/congestion.png} 
+	\end{center}
+
+	\par El control de congestión se ocupa de asegurar que la subred sea capaz de transportar el tráfico ofrecido. Es un asunto global en el que interviene el comportamiento de todos los hosts, todos los enrutadores, el proceso de almacenamiento y reenvío dentro de los enrutadores y todos los demás factores que tienden a disminuir la capacidad de transporte de la subred.
+
 \subsection{Métodos para el control de la congestión}
+
+	\par La presencia de congestión significa que la carga es (temporalmente) mayor de la que los recursos (en una parte de la red) pueden manejar. Dos soluciones vienen a la mente: aumentar los recursos o reducir la carga.
+	
+	\par La adición de memoria puede ayudar hasta cierto punto. Se demostró que si los enrutadores tienen infinita memoria, la congestión empeora en lugar de mejorar, ya que para cuando los paquetes llegan al principio de la cola su temporizador ha terminado (repetidamente) y se han enviado duplicados. Todos estos paquetes serán reenviados al siguiente enrutador, aumentando la carga en todo el camino hasta su destino.
+
+	\par Los procesadores lentos también pueden causar congestión. Si las CPUs de los enrutadores son lentas para llevar a cabo las tareas requeridas, las colas pueden alargarse, aun cuando haya un exceso de capacidad de línea. Las líneas de poco ancho de banda también pueden causar congestión. Probablemente la cola de una línea de salida de poco ancho de banda se va a agrandar si otras líneas tienen mayor ancho de banda y están recibiendo muchos paquetes destinados a la línea de salida.
+
+	\par La actualización de las líneas sin cambiar los procesadores o viceversa, por lo general ayuda un poco, pero con frecuencia simplemente solo desplaza el cuello de botella a otra parte. El problema real es un desajuste de las partes del sistema, este problema persistirá hasta que todos los componentes estén en equilibrio.
+
 \subsection{Enrutamiento consciente del tráfico}
+
+	\begin{center}
+			\includegraphics[width=7cm, height=5cm]{./imagenes/consciente.png} 
+	\end{center}
+
 \subsection{Control de admisión}
+
+	\begin{center}
+			\includegraphics[width=7cm, height=5cm]{./imagenes/admision.png} 
+	\end{center}
+
 \subsection{Regulación del tráfico}
+
+	\par El enfoque que vemos ahora puede usarse tanto en subredes de Circuitos Virtuales
+como en subredes de datagramas. Cada enrutador monitorea la demora de la cola de línea de salida. Para mantener una buena estimación del retardo de encolamiento, d, se puede realizar un muestreo periódico de la longitud de cola instantánea, s, y se puede actualizar d de acuerdo con:
+
+	\begin{center}
+		$ d_{new} = \alpha d_{old} + (1-\alpha) s $
+	\end{center}
+
+	\par donde a determina la rapidez con que el enrutador olvida la historia reciente.
+
+	\par Siempre que d rebasa el umbral, la línea de salida entra un estado de advertencia. Cada paquete nuevo que llega se revisa para ver si su línea de salida está en el estado de advertencia. Si es así, se realiza alguna acción. Esta puede ser una de varias alternativas que analizaremos a continuación:
+
+	\begin{itemize}
+		\item \textbf{Idea 1:} Usar una técnica de control de admisión para evitar que empeoren las congestiones que ya han comenzado y que consiste en que una vez que se ha detectado la congestión, no se establecen CVs nuevos hasta que ha desaparecido el problema.
+		\item \textbf{Idea 2:} permitir el establecimiento de nuevos CV, pero enrutando cuidadosamente los circuitos nuevos por otras rutas que no tengan problemas.
+
+		\item \textbf{Idea 3:} negociar un acuerdo entre el host y la subred cuando se
+establece un CV. Este arreglo normalmente especifica el volúmen y la forma del tráfico, la calidad de servicio requerido y otros parámetros. Para cumplir con su parte del acuerdo, la subred por lo general reservará recursos a lo largo de la ruta cuando se establezca el circuito. Estos recursos pueden incluir espacio en tablas y en búfer en los enrutadores y ancho de banda en las líneas. De este modo es poco probable que ocurran congestiones en los CV nuevos.
+	\end{itemize}
+
+
+
+
+
 \subsection{Desprendimiento de carga}
 
 \section{La capa de internet}
