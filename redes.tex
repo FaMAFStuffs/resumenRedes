@@ -829,8 +829,7 @@ y también lo es la internet. Sin resolver este problema solo se podrían tener 
 
 \subsection{Regulación del tráfico}
 
-	\par El enfoque que vemos ahora puede usarse tanto en subredes de Circuitos Virtuales
-como en subredes de datagramas. Cada enrutador monitorea la demora de la cola de línea de salida. Para mantener una buena estimación del retardo de encolamiento, d, se puede realizar un muestreo periódico de la longitud de cola instantánea, s, y se puede actualizar d de acuerdo con:
+	\par El enfoque que vemos ahora puede usarse tanto en subredes de Circuitos Virtuales como en subredes de datagramas. Cada enrutador monitorea la demora de la cola de línea de salida. Para mantener una buena estimación del retardo de encolamiento, \textit{d}, se puede realizar un muestreo periódico de la longitud de cola instantánea, \textit{s}, y se puede actualizar d de acuerdo con:
 
 	\begin{center}
 		$ d_{new} = \alpha d_{old} + (1-\alpha) s $
@@ -838,21 +837,70 @@ como en subredes de datagramas. Cada enrutador monitorea la demora de la cola de
 
 	\par donde a determina la rapidez con que el enrutador olvida la historia reciente.
 
-	\par Siempre que d rebasa el umbral, la línea de salida entra un estado de advertencia. Cada paquete nuevo que llega se revisa para ver si su línea de salida está en el estado de advertencia. Si es así, se realiza alguna acción. Esta puede ser una de varias alternativas que analizaremos a continuación:
+	\par Siempre que \textit{d} rebasa el umbral, la línea de salida entra un estado de advertencia. Cada paquete nuevo que llega se revisa para ver si su línea de salida está en el estado de advertencia. Si es así, se realiza alguna acción. Esta puede ser una de varias alternativas que analizaremos a continuación:
 
 	\begin{itemize}
 		\item \textbf{Idea 1:} Usar una técnica de control de admisión para evitar que empeoren las congestiones que ya han comenzado y que consiste en que una vez que se ha detectado la congestión, no se establecen CVs nuevos hasta que ha desaparecido el problema.
-		\item \textbf{Idea 2:} permitir el establecimiento de nuevos CV, pero enrutando cuidadosamente los circuitos nuevos por otras rutas que no tengan problemas.
+		\item \textbf{Idea 2:} Permitir el establecimiento de nuevos CV, pero enrutando cuidadosamente los circuitos nuevos por otras rutas que no tengan problemas.
 
-		\item \textbf{Idea 3:} negociar un acuerdo entre el host y la subred cuando se
-establece un CV. Este arreglo normalmente especifica el volúmen y la forma del tráfico, la calidad de servicio requerido y otros parámetros. Para cumplir con su parte del acuerdo, la subred por lo general reservará recursos a lo largo de la ruta cuando se establezca el circuito. Estos recursos pueden incluir espacio en tablas y en búfer en los enrutadores y ancho de banda en las líneas. De este modo es poco probable que ocurran congestiones en los CV nuevos.
+		\item \textbf{Idea 3:} Negociar un acuerdo entre el \textit{host} y la subred cuando se establece un CV. Este arreglo normalmente especifica el volúmen y la forma del tráfico, la calidad de servicio requerido y otros parámetros. Para cumplir con su parte del acuerdo, la subred por lo general reservará recursos a lo largo de la ruta cuando se establezca el circuito. Estos recursos pueden incluir espacio en tablas y en búfer en los enrutadores y ancho de banda en las líneas. De este modo es poco probable que ocurran congestiones en los CV nuevos.
 	\end{itemize}
 
+	\par A continuación vemos distintos algoritmos sobre cómo proceder cuando una línea de un enrutador entró en estado de advertencia y le llegó un paquete.
 
+		\begin{itemize}
+			\item \textbf{Método de bit de advertencia:} Señalar el estado de advertencia
+activando un bit especial en el encabezado del paquete. Cuando el paquete llega a su destino, la entidad transportadora copia el bit en la siguiente confirmación de recepción que se regresa al origen. A continuación el origen reduce el tráfico. Mientras el enrutador está en estado de advertencia, continua activando el bit de advertencia, lo que significa que el origen continua obteniendo confirmaciones de recepción con dicho bit activado.
 
+			\par El origen monitorea la fracción de confirmaciones de recepción con el bit activado y ajusta su tasa de transmisión de manera acorde. En tanto los bits de advertencia continuan fluyendo, el origen continua disminuyendo su tasa de transmisión.
 
+			\par Cuando la tasa de transmisión disminuye lo suficiente, el origen incrementa su tasa de transmisión. Debido a que cada enrutador a lo largo de la ruta puede activar el bit de advertencia, el tráfico se incrementa solo cuando no había enrutadores con problemas.
+
+			\item \textbf{Método de paquetes reguladores.} El enrutador regresa un paquete regulador al \textit{host} de origen, proporcionándole el destino encontrado en el paquete. El paquete original se etiqueta (se activa un bit del encabezado), de manera que no genere más paquetes reguladores más adelante en la ruta y después se reenvía de la manera usual.
+	
+			\par Cuando el host de origen obtiene el paquete regulador, se le pide que reduzca en un porcentaje X el tráfico enviado al destino especificado. Puesto que otros paquetes dirigidos al mismo destino probablemente ya están en camino y generarán más paquetes reguladores, el \textit{host} debe ignorar los paquetes reguladores que se refieran a ese destino por un intervalo fijo de tiempo. Una vez que haya expirado ese tiempo, el \textit{host} escucha más paquetes reguladores durante otro intervalo. Si llega alguno, la línea todavía está congestionada, por lo que el \textit{host} reduce el flujo aún más y comienza a ignorar nuevamente los paquetes reguladores. Si no llega ningún paquete de este tipo durante el período de escucha, el \textit{host} puede incrementar el flujo otra vez.
+ 
+			\par Manejo de la tasa de datos de transmisión de un host. Por lo general el primer paquete regulador causa que la tasa de datos se reduzca en 0,5 con respecto a su tasa anterior, el siguiente causa una reducción en 0,25, etc. Los incrementos se dan en aumentos más pequeños para evitar que la congestión se vuelva a generar rápidamente.
+
+			\item \textbf{Variación de paquetes reguladores.} Los enrutadores pueden mantener varios umbrales. Dependiendo de qué umbral se ha rebasado, el paquete regulador puede contener una advertencia suave, una severa o un \textit{ultimatum}.
+			
+			\item \textbf{Método de Paquetes reguladores de salto por salto.} Este método resuelve el problema del envío de paquetes reguladores a los \textit{hosts} de origen que no funcionan bien por la reacción lenta. En este caso hay que hacer que el paquete regulador ejerza su efecto en cada salto que da. Cuando el paquete regulador llega a un enrutador F, se le obliga a F a reducir el flujo al siguiente enrutador D (F deberá destinar más búferes al flujo). Luego el paquete regulador llega al enrutador E anterior a F e indica a E que reduzca el flujo a F. Esto impone una mayor carga a los búferes de E, pero da un alivio inmediato a F. Y se sigue así sucesivamente.
+			
+			\begin{center}
+				\includegraphics[width=10cm, height=12cm]{./imagenes/salto.png} 
+			\end{center}
+	
+		\end{itemize}
 
 \subsection{Desprendimiento de carga}
+
+	\par Cuando ninguno de los métodos anteriores elimina la congestión, los enrutadores pueden sacar la artillería pesada: el desprendimiento de carga, que es una manera rebuscada de decir que cuando se inunda a los enrutadores con paquetes que no pueden manejar, simplemente se tiran.
+
+	\par Tratar con la congestión después que se detecta por primera vez es más efectivo que dejar que se dañe el trabajo y luego tratar de solucionarlo. Se deben descartar paquetes antes de que se ocupe todo el espacio de búfer. Algunos criterios para escoger qué paquetes descartar:
+	
+	\begin{itemize}
+		\item Según el tipo de aplicación que se está usando.
+			\begin{itemize}
+				\item En la transferencia de archivos vale más un paquete viejo que uno nuevo (\textbf{estrategia vino}).
+				\item En contraste, en multimedia es más importante un paquete nuevo que uno viejo (\textbf{estrategia leche}).
+			\end{itemize}
+		\item Según la importancia de los paquetes.
+			\begin{itemize}
+				\item  Las aplicaciones deben marcar sus paquetes con clases de prioridades para indicar su importancia.
+				\item Los enrutadores primero se desprenden de paquetes de la clase más baja,
+luego los de la siguiente clase, etc.
+			\end{itemize}			 
+	\end{itemize}
+
+	\par En algunos protocolos de transporte (Ej: TCP), la respuesta a paquetes perdidos es que el origen disminuya su velocidad. TCP fue diseñado para redes cableadas, y éstas son muy confiables, por lo tanto, la pérdida de paquetes se debe principalmente a desbordamientos de búferes y no a errores de transmisiones. Este hecho puede usarse para reducir la congestión, usando desprendimiento de carga junto con reducción de tráfico.
+
+	\subsubsection{Algoritmo de detección temprana aleatoria (RED)}
+	
+		\par Este algoritmo es una combinación de los dos anteriores. Para detectar cuándo comenzar a descartar paquetes, los enrutadores mantienen un promedio móvil de sus longitudes de cola. Cuando las longitudes de cola en algunas líneas sobrepasa el umbral, se dice que la línea está congestionada. 
+		
+		\par Debido a que tal vez el enrutador no puede saber cuál origen está causando la mayoría de los problemas, probablemente lo mejor que se puede hacer es elegir un paquete al azar de la cola que puso en marcha la acción. Elegir paquetes al azar hace más probable que los \textit{hosts} enviadores más rápidos pierdan un paquete, lo noten, y reduzcan su tasa de transferencia.
+
+		\par Descartar el paquete seleccionado y no reportarlo. El origen notará falta de confirmación de recepción y responderá disminuyendo la velocidad de transmisión.
 
 \section{La capa de internet}
 	\subsection{El protocolo IP versión 4}
