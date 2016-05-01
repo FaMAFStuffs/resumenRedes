@@ -50,23 +50,15 @@ redes de propiedad privada que operan dentro de un solo edificio, como una casa,
 oficina o fábrica.
 
 \subsubsection{Difusión}
-\par Si una máquina envía un mensaje todas las demás lo reciben, dentro del mensaje 
-se indica el destinatario. Una máquina al recibir un paquete analiza si va destinado a 
-ella y en ese caso lo procesa, sino lo ignora. Otras variantes son: \textit{broadcasting}, 
-consiste en enviar un paquete a todos y \textit{multicasting} envia a un grupo 
-particular.
+\par Si una máquina envía un mensaje todas las demás lo reciben, dentro del mensaje se indica el destinatario. Una máquina al recibir un paquete analiza si va destinado a ella y en ese caso lo procesa, sino lo ignora. Otras variantes son: \textit{broadcasting}, consiste en enviar un paquete a todos y \textit{multicasting} envia a un grupo particular.
 \par Ejemplos de redes de área local son WIFI y Ethernet.
 
-\textbf{WiFi:} son redes inalámbricas, operan a velocidades desde 11 hasta cientos de 
-Mbps.
+\par \textbf{WiFi:} son redes inalámbricas, operan a velocidades desde 11 hasta cientos de Mbps.
 
-\textbf{Ethernet:} Son redes de difusión basada en bus con control descentralizado 
-que funcionan de 10 Mbps a 10 Gbps. Se puede transmitir siempre que se desee; si 
-dos paquetes colisionan, es decir mas de una máquina escribiendo simultáneamente en 
-el cable, se espera un tiempo aleatorio e intenta más tarde.
+\par \textbf{Ethernet:} Son redes de difusión basada en bus con control descentralizado que funcionan de 10 Mbps a 10 Gbps. Se puede transmitir siempre que se desee; si dos paquetes colisionan, es decir mas de una máquina escribiendo simultáneamente en el cable, se espera un tiempo aleatorio e intenta más tarde.
 
 \begin{center} 
-	\includegraphics[width=8cm, height=6cm]{./imagenes/arealocal.png} 
+	\includegraphics[width=8cm, height=5cm]{./imagenes/arealocal.png} 
 \end{center}
 
 \subsection{Redes de área metropolitana}
@@ -93,7 +85,7 @@ una ciudad.
 	\end{itemize}	 
 	
 	\begin{center}
-		\includegraphics[width=10cm, height=6cm]{./imagenes/metropolitana2.png} 
+		\includegraphics[width=10cm, height=5cm]{./imagenes/metropolitana2.png} 
 	\end{center}
 
 \subsection{Redes de área amplia}
@@ -107,21 +99,25 @@ enteras, para ir de una máquina a otra hay distintas rutas alternativas.
 \par Los elementos de conmutación, tambien llamados enrutadores dependiendo de la capa de red en la actúan, conectan tres o más líneas de transmisión. Los datos por línea de entrada se envían por alguna línea de salida elegida especialmente.
 Dos enrutadores que no comparten una línea de transmisión se conectan indirectamente a través de otros enrutadores.
 
-Un paquete se envía de un enrutador a otro a través de enrutadores intermedios, almacenándose enteramente en cada enrutador intermedio hasta que la línea requerida de salida esté libre y luego se reenvía (store-and-forward). Otra forma sería no guardar el mensaje, no esperar a que llegue entero antes de reenviarlo (cut-through).
+Un paquete se envía de un enrutador a otro a través de enrutadores intermedios, almacenándose enteramente en cada enrutador intermedio hasta que la línea requerida de salida esté libre y luego se reenvía (\textit{store-and-forward}). Otra forma sería no guardar el mensaje, no esperar a que llegue entero antes de reenviarlo (\textit{cut-through}).
 
 Los mensajes se dividen en paquetes, los cuales tienen un número de secuencia. Estos paquetes se mandan en la red de uno en uno. Los paquetes se van depositando en el host receptor que reensambla el mensaje original. En algunas redes todos los paquetes del mensaje deben seguir la misma ruta, en otras cada paquete se enruta por separado. Las decisiones de enrutamiento se hacen de manera local, un algoritmo de enrutamiento describe la manera en que un enrutador toma esa decisión.
 
+\begin{center} 
+	\includegraphics[width=8cm, height=5cm]{./imagenes/wan1.png} 
+\end{center}
+
 \subsubsection{Ejemplos de WAN:}
 \begin{itemize}
-\item Sistema telefónico fijo (Ej:. ADSL):
+\item Sistema telefónico fijo (Ej: ADSL):
 \begin{itemize}
 	\item Cada domicilio conectado por un cable de cobre a una End office
- 	\item Toll offices usadas para reenvío de mensajes.
- 	\item Toll offices unidas por cables de fibra óptica llamados troncales.
+ 	\item \textit{Toll offices} usadas para reenvío de mensajes.
+ 	\item \textit{Toll offices} unidas por cables de fibra óptica llamados troncales.
 \end{itemize}	
 
 \begin{center} 
-	\includegraphics[width=8cm, height=6cm]{./imagenes/telefonico.png} 
+	\includegraphics[width=8cm, height=5cm]{./imagenes/telefonico.png} 
 \end{center}
 
 \item Una red de teléfonos celulares (Ej: 3G o 4G).
@@ -140,14 +136,14 @@ Los mensajes se dividen en paquetes, los cuales tienen un número de secuencia. 
 Con frecuencia las personas conectadas a una red desean comunicarse con las 
 personas conectadas a otra red diferente. Las puertas de enlace proveen la conexión y 
 la traducción necesaria. Un conjunto de redes interconectadas se llama interred 
-(internet), Internet es una inter red.
+(internet), Internet es una interred.
 
 \begin{center} 
 	\includegraphics[width=8cm, height=6cm]{./imagenes/interred.png} 
 \end{center}
 
 \section{Software de red}
-\par Las primeras redes de computadoras se diseñaron teniendo en cuenta al hardware 
+	\par Las primeras redes de computadoras se diseñaron teniendo en cuenta al hardware 
 como punto principal y al software como secundario. Pero esta estrategia ya no 
 funciona. Ahora el software de red está muy estructurado.
 
@@ -167,6 +163,10 @@ primitivos pone la capa mas baja a disposición de la capa superior inmediata.
 \par El conjunto de capas y protocolos se conoce como \textbf{arquitectura de red} o 
 \textbf{nomenclatura de pila de protocolos}.
 
+\begin{center} 
+	\includegraphics[width=7cm, height=7cm]{./imagenes/jerarquia1.png} 
+\end{center}
+
 \par Un proceso de aplicación se ejecuta en la \textit{capa 5}, la cual produce un 
 mensaje y lo pasa a la \textit{capa 4} para su transmisión. La \textit{capa 4} pone un 
 encabezado en el mensaje para identificarlo y pasa el resultado a la \textit{capa 3}. El 
@@ -183,6 +183,10 @@ a la \textit{capa 2} que no solo agrega un encabezado a cada pieza sino tambien 
 terminador, y pasa la unidad resultante a la \textit{capa 1} para su transmisión.
 \par En la máquina receptora el mensaje pasa hacia arriba de capa en capa, perdiendo 
 los encabezados conforme avanza.
+
+\begin{center} 
+	\includegraphics[width=10cm, height=7cm]{./imagenes/jerarquia2.png} 
+\end{center}
 
 \subsection{Aspectos de diseño para las capas}
 
@@ -211,7 +215,7 @@ llegan en orden.
 \par Hay que evitar que un emisor rápido sature de datos a un receptor lento. Hay 
 soluciones a este problema donde el receptor proporciona algún tipo de 
 retroalimentación al emisor, directa o indirectamente, dependiendo de la situación real 
-del receptor. A este tema se lo denomina c\textbf{control de flujo}. A veces en la red 
+del receptor. A este tema se lo denomina \textbf{control de flujo}. A veces en la red 
 demasiadas máquinas quieren enviar demasiados mensajes y la red no puede 
 mandarlos a todos, esta sobrecarga se llama \textbf{congestión}. Una solución es que 
 cada máquina emisora reduzca el tráfico de salida.
@@ -242,7 +246,7 @@ de destino y cada uno se enruta a través del sistema, independientemente de los
 demás. Algunos servicios son confiables en el sentido que nunca pierden datos, pero 
 por lo general en un servicio confiable el receptor confirma la recepción de cada 
 mensaje. Al servicio no orientado a la conexión no confiable, es decir sin confirmación 
-de recepción, se lo conoce como servicio de datagramas. 
+de recepción, se lo conoce como \textbf{servicio de datagramas}. 
 \par A veces se desea no tener que establecer una conexión para enviar un mensaje 
 corto, pero la confiabilidad es esencial. Para estas aplicaciones se usa el servicio de 
 \textbf{datagramas confirmados}. En el servicio de \textbf{solicitud-respuesta} el 
@@ -273,123 +277,61 @@ acceso al medio se ocupa de esto.
 
 \subsection{El modelo de referencia TCP/IP}
 
-Se eligió una red de conmutación de paquetes basada en una capa de interred no 
-orientada a la conexión.
-– El trabajo de la capa de interred es permitir que los hosts inyecten paquetes dentro de cualquier red y que estos viajen a su destino de manera independiente.
-– Tal vez lleguen en un orden distinto al cual fueron enviados, en cuyo caso las capas mas altas deberán ordenarlos, si se desea una entrega ordenada.
-– La capa de interred define un paquete de formato y protocolo oficial llamado IP (protocolo de internet).
-– Direcciones IP
-• 4 números entre 0 y 255 separados por ‘.’ .
-• P. ej. 200, 45.191.35
-• El trabajo de la capa de interred es entregar paquetes IP al destinatario.
-– El enrutamiento de paquetes es el aspecto principal, con el propósito de evitar la congestión.
+	\par Se eligió una red de conmutación de paquetes basada en una capa de interred no 
+orientada a la conexión. El trabajo de la capa de interred es permitir que los \textit{hosts} inyecten paquetes dentro de cualquier red y que estos viajen a su destino de manera independiente. Tal vez lleguen en un orden distinto al cual fueron enviados, en cuyo caso las capas mas altas deberán ordenarlos, si se desea una entrega ordenada. La capa de interred define un paquete de formato y protocolo oficial llamado IP (\textit{protocolo de internet}).
 
- La capa arriba de la capa interred es la capa de transporte, la cual esta diseñada para permitir que las entidades iguales en los hosts de origen y destino puedan llevar a cabo una conversación.
- Se tienenn dos protocoles de transporte
-– TCP es confiable, orientado a la conexión y permite que un flujo de bytes que se origina en una máquina se entregue sin errores en cualquier otra máquina en la interred.
- TCP divide el flujo en de bytes entrantes en mensajes discretos y pasa cada uno de ellos a la capa de interred.
- En el destino el proceso TCP receptor reensambla en el flujo de salida los mensajes recibidos.
- TCP también maneja el control de flujo para que un emisor rápido no sature con mas mensajes que los que puede manejar a un receptor lento.
-– UDP es un protocolo no confiable y no orientado a la conexión, para aplicaciones que no desean el control de flujo ni la secuenciación de mensajes.
- Tiene un amplio uso en consultas de solicitud-respuesta de tipo cliente-servidor en un solo envío y en aplicaciones de transmisión de voz y video.
+	\par \textbf{Direcciones IP:} compuestas por 4 números entre 0 y 255 separados por un punto . Ej: 200.45.191.35. El trabajo de la capa de interred es entregar paquetes IP al destinatario. El enrutamiento de paquetes es el aspecto principal, con el propósito de evitar la congestión.
 
-La capa de aplicación contiene todos los protocolos de nivel mas alto: terminal virtual (TELNET), transferencia de archivos (FTP), correo electrónico (SMTP), para resolución de nombres de host en sus direcciones de red (DNS), para páginas web (HTTP).
+ 	\par La capa arriba de la capa interred es la capa de transporte, la cual esta diseñada para permitir que las entidades iguales en los hosts de origen y destino puedan llevar a cabo una conversación. Se tienen dos protocolos de transporte:
 
+	\begin{itemize}
+		\item \textbf{TCP:} es confiable, orientado a la conexión y permite que un flujo de bytes que se origina en una máquina se entregue sin errores en cualquier otra máquina en la interred. Divide el flujo en de bytes entrantes en mensajes discretos y pasa cada uno de ellos a la capa de interred. En el destino el proceso TCP receptor reensambla en el flujo de salida los mensajes recibidos. TCP también maneja el control de flujo para que un emisor rápido no sature con mas mensajes que los que puede manejar a un receptor lento.
+		\item \textbf{UDP} es un protocolo no confiable y no orientado a la conexión, para aplicaciones que no desean el control de flujo ni la secuenciación de mensajes. Tiene un amplio uso en consultas de solicitud-respuesta de tipo cliente-servidor en un solo envío y en aplicaciones de transmisión de voz y video.
+	\end{itemize}
+
+	\par La capa de aplicación contiene todos los protocolos de nivel mas alto: terminal virtual (TELNET), transferencia de archivos (FTP), correo electrónico (SMTP), para resolución de nombres de host en sus direcciones de red (DNS), para páginas web (HTTP).
+
+	\begin{center}
+		\includegraphics[width=11cm, height=5cm]{./imagenes/esquema.png} 
+	\end{center}
+	
 \subsection{Una crítica al modelo de referencia TCP/IP}
 
-Problemas:
-– No se distingue entre servicio, interfaz y protocolo.
- O sea no se distingue bien entre especificación e implementación.
-– No es un modelo general: no esta ajustado para describir ninguna pila de protocolos mas que TCP/IP.
-– No se mencionan las capas físicas y de enlace de datos
-– Protocolos altamente entrincherados y difíciles de remplazar.
+	\par El modelo TCP/IP tiene problemas, alguna de ellos son: No se distingue entre servicio, interfaz y protocolo, o sea no se distingue bien entre especificación e implementación. No es un modelo general no está ajustado para describir ninguna pila de protocolos mas que TCP/IP. No se mencionan las capas físicas y de enlace de datos. Protocolos altamente entrincherados y difíciles de remplazar.
 
 \section{Redes de ejemplo}
 
 \subsection{Internet}
-\par Internet es un inmenso conjunto de redes diferentes, que usan ciertos 
-protocolos comunes y proporcionan ciertos servicios comunes. A este sistema nadie 
-lo planeo y nadie lo controla. 
+\par Internet es un inmenso conjunto de redes diferentes, que usan ciertos protocolos comunes y proporcionan ciertos servicios comunes. A este sistema nadie lo planeo y nadie lo controla. 
+
 \par Los protocolos TCP e IP están preparados para manejar comunicaciones por 
 interredes. Se desarrollo una interfaz de programación para la red llamada sockets 
-de Berkley.
+de Berkeley.
 
-– Luego se creo el DNS (sistema de nombres de dominios) para organizar máquinas 
-dentro de dominios y resolver nombres de hosts en direcciones IP.
-– Una máquina esta en Internet si ejecuta una pila de protocolos TCP/IP, tiene una 
-dirección IP y puede enviar paquetes a todas las demás maquinas de Internet.
+	\par Luego se creo el DNS (sistema de nombres de dominios) para organizar máquinas 
+dentro de dominios y resolver nombres de \textit{hosts} en direcciones IP. Una máquina esta en Internet si ejecuta una pila de protocolos TCP/IP, tiene una dirección IP y puede enviar paquetes a todas las demás maquinas de Internet. Muchas máquinas pueden llamar a un proveedor de servicios de Internet mediante un modem, recibir direcciones IP temporales y enviar paquetes a otros hosts de Internet.
 
-Muchas máquinas pueden llamar a un proveedor de servicios de Internet mediante 
-un modem, recibir direcciones IP temporales y enviar paquetes a otros hosts de 
-Internet.
+\section{Modelo Hibrido}
 
-\subsection{El modelo utilizado en este libro}
-\section{Resumen}
-
-\par Las redes de computadoras tienen muchos usos, tanto para empresas como para 
-individuos, en el hogar y en movimiento. Las empresas usan redes de computadoras 
-para compartir la información corporativa, por lo general mediante el modelo cliente-
-servidor en donde las computadoras de los empleados actúan como clientes que 
-acceden a poderosos servidores en la sala de máquinas. Para los individuos, las redes 
-ofrecen acceso a una variedad de recursos de información y entretenimiento, así como 
-una manera de comprar y vender productos y servicios. Con frecuencia los individuos 
-acceden a Internet por medio de sus proveedores de teléfono o cable en el hogar, 
-aunque cada vez se utiliza más el acceso inalámbrico para laptops y teléfonos. Los 
-avances tecnológicos permiten nuevos tipos de aplicaciones móviles y redes con 
-computadoras integradas a los electrodomésticos y demás dispositivos para el 
-consumidor. Los mismos avances generan cuestiones sociales tales como las 
-relacionadas con la privacidad.
-\par En términos generales, podemos dividir a las redes en LAN, MAN, WAN e 
-interredes. Por lo general las redes LAN cubren todo un edificio y operan a velocidades 
-altas. Las redes MAN comúnmente cubren toda una ciudad. El sistema de televisión 
-por cable es un ejemplo, ya que ahora muchas personas lo utilizan para acceder a 
-Internet. Las redes WAN pueden cubrir un país o continente. Algunas de las 
-tecnologías utilizadas para construir estas redes son de punto a punto (como un 
-cable), mientras que otras son de difusión (como las redes inalámbricas). Las redes se 
-pueden interconectar con enrutadores para formar interredes, de las cuales Internet es 
-el ejemplo más grande y popular. Las redes inalámbricas, como las redes LAN 802.11 
-y de telefonía móvil 3G, también se están volviendo muy populares.
-\par El software de red se basa en los protocolos, que son reglas mediante las cuales 
-los procesos se comunican entre sí. La mayoría de las redes soportan jerarquías de 
-protocolos, en donde cada capa proporciona servicios a la capa inmediata superior y 
-los aísla de los detalles sobre los protocolos que se utilizan en las capas inferiores. Por 
-lo general las pilas de protocolos se basan en el modelo OSI o en el modelo TCP/IP. 
-Ambos modelos tienen capas de enlace, red, transporte y aplicación, pero difieren en 
-las otras capas. Los aspectos de diseño incluyen: confiabilidad, asignación de recursos, 
-crecimiento, seguridad, etc.
-\par Las redes proveen varios servicios a sus usuarios. Estos servicios pueden variar, 
-desde la entrega de paquetes sin conexión de mejor esfuerzo hasta la entrega 
-garantizada orientada a conexión. En algunas redes se proporciona servicio sin 
-conexión en una capa y servicio orientado a conexión en la capa inmediata superior.
-Entre las redes más conocidas están: Internet, la red de telefonía móvil 3G y las redes 
-LAN 802.11. Internet evolucionó de ARPANET, a la que se agregaron otras redes para 
-formar una interred. En realidad la Internet de la actualidad es una colección de 
-muchos miles de redes que utilizan la pila de protocolos TCP/IP. La red de telefonía 
-móvil 3G proporciona acceso inalámbrico y móvil a Internet, con es LAN inalámbricas 
-basadas en el estándar IEEE 802.11 se implementan en muchos hogares y cafés; 
-pueden proporcionar conectividad a velocidades en mayores 100 Mbps. También están 
-surgiendo nuevos tipos de redes, como las redes de sensores integradas y las redes 
-basadas en tecnología RFID.
-Para permitir que varias computadoras se comuniquen entre sí se requiere una gran 
-cantidad de estandarización, tanto en hardware como en software. Las organizaciones 
-tales como ITU-T, ISO, IEEE e IAB administran distintas partes del proceso de 
-estandarización.
-
-
-
+	\begin{center}
+		\includegraphics[width=8cm, height=5cm]{./imagenes/modelo.png} 
+	\end{center}
 
 \chapter{LA CAPA DE RED}
-La capa de red se encarga de llevar los paquetes todo el camino, desde el origen hasta el destino. Para llegar al destino tal vez sea necesario realizar muchos saltos en el camino por enrutadores intermedios. Esta función ciertamente contrasta con la de la capa de enlace de datos, cuya única meta es mover tramas de un extremo del cable al otro. Por lo tanto, la capa de red es la capa más baja que maneja la transmisión de extremo a extremo.
-\par Para lograr sus objetivos, la capa de red debe conocer la topología de la red (es
+
+	\par La capa de red se encarga de llevar los paquetes todo el camino, desde el origen hasta el destino. Para llegar al destino tal vez sea necesario realizar muchos saltos en el camino por enrutadores intermedios. Esta función ciertamente contrasta con la de la capa de enlace de datos, cuya única meta es mover tramas de un extremo del cable al otro. Por lo tanto, la capa de red es la capa más baja que maneja la transmisión de extremo a extremo.
+
+	\par Para lograr sus objetivos, la capa de red debe conocer la topología de la red (es
 decir, el conjunto de todos los enrutadores y enlaces) y elegir las rutas apropiadas
 incluso para redes más grandes. También debe tener cuidado al escoger las rutas para
 no sobrecargar algunas de las líneas de comunicación y los enrutadores, y dejar
 inactivos a otros. Por último, cuando el origen y el destino están en redes diferentes, ocurren nuevos problemas. La capa de red es la encargada de solucionarlos. En este capítulo estudiaremos todos estos temas y los ilustraremos, principalmente mediante el uso de Internet y su protocolo de capa de red, IP.
 
 \section{Aspectos de diseño de la capa de red}
-\subsection{Servicios proporcionados a la capa de transporte}
 
-La capa de red proporciona servicios a la capa de transporte en la interfaz entre la 
+	\subsection{Servicios proporcionados a la capa de transporte}
+
+		\par La capa de red proporciona servicios a la capa de transporte en la interfaz entre la 
 capa de red y de transporte. Una pregunta importante es qué tipo de servicios 
 proporciona precisamente la capa de red a la capa de transporte. Hay que diseñar los 
 servicios de manera cuidadosa, con los siguientes objetivos en mente:
@@ -401,6 +343,7 @@ servicios de manera cuidadosa, con los siguientes objetivos en mente:
 		\item Las direcciones de red disponibles para la capa de transporte deben usar 
 		un plan de numeracin uniforme, incluso a traves de redes LAN y WAN.
 	\end{itemize}
+	
 \par Dadas estas metas, los diseñadores de la capa de red tienen mucha libertad para 
 escribir especificaciones detalladas de los servicios que se ofrecerán a la capa de 
 transporte. Con frecuencia esta libertad degenera en una batalla campal entre dos 
@@ -441,13 +384,15 @@ manera independiente.  Por eso debe levar una dirección de destino completa.
 			\par Cuando llega un paquete: Se lo almacena y se comprueba que llegó bien; se reenvía al destino de acuerdo con la tabla del enrutador.
 			\item Los enrutadores requieren la capacidad de reemplazar identificadores de conexión en los paquetes salientes, ya que podria darse el caso de que un host H1 inicie una conexión con identificador 1; luego otro host H3 inicia conexión con identificador 1, y ambos hosts están conectados al mismo enrutador A.
 			\end{itemize}
+			
 	\par Ahora veamos como funciona una red de datagramas. Suponga que el proceso P1 de la figura tiene un mensaje largo para P2. Dicho proceso entrega el mensaje a la capa de transporte y le indica a ésta que lo envíe al proceso P2 en el host H2. El código de la capa de transporte se ejecuta en H1, por lo general dentro del sistema operativo. Dicho código agrega un encabezado de transporte al frente del mensaje y entrega el resultado a la capa de red, que quizá sólo sea otro procedimiento dentro del sistema operativo.
-\begin{center} 
-	\includegraphics[width=8cm, height=6cm]{./imagenes/norientado.png} 
-\end{center}
 
-\par Problema:  
-\par IP es el ejemplo dominante de un servicio de red sin conexión. Cada paquete 
+	\begin{center} 
+		\includegraphics[width=8cm, height=6cm]{./imagenes/norientado.png} 
+	\end{center}
+
+	\par Problema:  
+	\par IP es el ejemplo dominante de un servicio de red sin conexión. Cada paquete 
 transporta una dirección IP de destino que los enrutadores usan para reenviar cada 
 paquete por separado. Las direcciones son de 32 bits en los paquetes IPv4 y de 128 
 bits en los paquetes IPv6.
@@ -510,6 +455,7 @@ conexión o etiqueta de 20 bits.
 	los paquetes de datos simplemente siguen la ruta ya establecida. Este último caso a 
 	veces se llama enrutamiento de sesión, dado que una ruta permanece vigente 
 	durante toda una sesión.
+	
 	\par En ocasiones es útil distinguir entre el enrutamiento, que es el proceso que 
 	consiste en tomar la decisión de cuáles rutas utilizar, y el reenvío, que consiste en la 
 	acción que se toma cuando llega un paquete. Podemos considerar que un enrutador 
@@ -652,28 +598,28 @@ conexión o etiqueta de 20 bits.
     algos de estas ideas:
 
 	\begin{itemize}
-		\item Solución 1: integrar un contador de saltos en el encabezado de cada 
+		\item \underline{Solución 1:} integrar un contador de saltos en el encabezado de cada 
 		paquete, que disminuya con cada salto y el paquete se descarte cuando el 
 		contador llega a 0. Lo ideal es inicializar el contador de saltos a la longitud de la 
 		ruta entre el origen y el destino. Si el emisor desconoce el tamaño de la ruta, 
 		puede inicializar el contador al peor caso, es decir, al diámetro total de la subred.
 		
-		\item Solución 2: llevar un registro de los paquetes difundidos para evitar 
+		\item \underline{Solución 2:} llevar un registro de los paquetes difundidos para evitar 
 		enviarlos por segunda vez. Hacer que el enrutador de origen ponga un número de 
 		secuencia en cada paquete que recibe de sus hosts. Para cada enrutador de origen 
 		hay una lista con los números de secuencia originados en ese enrutador que ya ha 
 		visto. Si un paquete de entrada está en la lista, no se difunde.
 
-		Para evitar que las listas crezcan sin límites podemos agregar una columna 
+		\par Para evitar que las listas crezcan sin límites podemos agregar una columna 
 		contador que indica el mayor número de secuencia tal que llegaron paquetes con 
 		todos los numeros de secuencia anteriores desde ese enrutador de origen.
 		
-		\item Solución 3: Una variación de la inundación, un poco mas práctica, es la 
+		\item \underline{Solución 3:} Una variación de la inundación, un poco mas práctica, es la 
 		inundación selectiva. Los enrutadores no envían cada paquete de entrada por 
 		todas las líneas, sino solo por aquellas que van aproximadamente en la dirección 
 		correcta.
 
-		A nivel de información, se necesita saber en qué  dirección va cada línea y en qué 
+		\par A nivel de información, se necesita saber en qué  dirección va cada línea y en qué 
 		dirección está el destino.
 		
 		\par La inundación no es práctica en la mayoría de las aplicaciones, pero tiene
@@ -711,6 +657,7 @@ conexión o etiqueta de 20 bits.
 			ECO que el receptor simplemente marca con la hora y los regresa tan rápido 
 			como puede.
 		\end{itemize}
+		
 	\par Suponga que el retardo se usa como métrica y que el enrutador conoce el 
 	retardo a cada uno de sus vecinos. Una vez cada \textit{T} mseg, cada enrutador 
 	envía a todos sus vecinos una lista de sus retardos estimados a cada destino.
@@ -737,7 +684,7 @@ La razón de porque las malas noticias viajan con lentitud es: ningún enrutador
 Gradualmente todos los enrutadores elevan cuentas hacia el infinito, pero el número de intercambios requeridos depende del valor numérico usado para el infinito.
 Si la métrica usada es el número de saltos, es prudente hacer que el infinito sea igual a la ruta más larga más 1.
 
-Si la métrica es el retardo de tiempo no hay un límite superior
+	\par Si la métrica es el retardo de tiempo no hay un límite superior
 bien definido,
 se necesita un valor alto para evitar que una ruta con un retardo grande sea tratada como si estuviera desactivada.
 Este es el problema de la cuenta hasta el infinito.
