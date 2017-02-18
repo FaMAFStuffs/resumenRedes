@@ -48,7 +48,6 @@ conectan redes pequeñas punto a punto.
 \par Las redes de área local, generalmente llamadas LAN (Local Area Networks), son 
 redes de propiedad privada que operan dentro de un solo edificio, como una casa, 
 oficina o fábrica.
-
 \subsubsection{Difusión}
 \par Si una máquina envía un mensaje todas las demás lo reciben, dentro del mensaje se indica el destinatario. Una máquina al recibir un paquete analiza si va destinado a ella y en ese caso lo procesa, sino lo ignora. Otras variantes son: \textit{broadcasting}, consiste en enviar un paquete a todos y \textit{multicasting} envia a un grupo particular.
 \par Ejemplos de redes de área local son WIFI y Ethernet.
@@ -120,8 +119,8 @@ Los mensajes se dividen en paquetes, los cuales tienen un número de secuencia. 
 	\includegraphics[width=8cm, height=5cm]{./imagenes/telefonico.png} 
 \end{center}
 
-\item Una red de teléfonos celulares (Ej: 3G o 4G).
 \begin{itemize}
+	\item Una red de teléfonos celulares (Ej: 3G o 4G).
 	\item Celdas con estaciones base: cada smartphone opera en una celda.
 	\item Celdas conectados a centros de conmutación: para conectar distintas celdas
  	\item Centros de conmutación conectados a la red telefónica pública.
@@ -823,6 +822,7 @@ y también lo es la internet. Sin resolver este problema solo se podrían tener 
 
 \subsection{Control de admisión}
 
+	No se establecen nuevos circuitos Virtuales hasta que desaparece el problema.
 	\begin{center}
 			\includegraphics[width=7cm, height=5cm]{./imagenes/admision.png} 
 	\end{center}
@@ -894,7 +894,7 @@ luego los de la siguiente clase, etc.
 
 	\par En algunos protocolos de transporte (Ej: TCP), la respuesta a paquetes perdidos es que el origen disminuya su velocidad. TCP fue diseñado para redes cableadas, y éstas son muy confiables, por lo tanto, la pérdida de paquetes se debe principalmente a desbordamientos de búferes y no a errores de transmisiones. Este hecho puede usarse para reducir la congestión, usando desprendimiento de carga junto con reducción de tráfico.
 
-	\subsubsection{Algoritmo de detección temprana aleatoria (RED)}
+	\subsection{Algoritmo de detección temprana aleatoria (RED)}
 	
 		\par Este algoritmo es una combinación de los dos anteriores. Para detectar cuándo comenzar a descartar paquetes, los enrutadores mantienen un promedio móvil de sus longitudes de cola. Cuando las longitudes de cola en algunas líneas sobrepasa el umbral, se dice que la línea está congestionada. 
 		
@@ -902,10 +902,204 @@ luego los de la siguiente clase, etc.
 
 		\par Descartar el paquete seleccionado y no reportarlo. El origen notará falta de confirmación de recepción y responderá disminuyendo la velocidad de transmisión.
 
-\section{La capa de internet}
-	\subsection{El protocolo IP versión 4}
-	\subsection{Direcciónes IP}
+	 \subsection{Inter-redes}
+	 Cuando dos o mas redes se unen se forma una \textbf{Inter-red}. Cuando los paquetes enviados por una fuente en una red deben transitar a través de una o más redes
+foráneas antes de llegar a la red de destino, pueden ocurrir muchos problemas en las interfaces entre
+las redes.
 
+	\par Algunos problemas entre las interfaces de las diferentes redes:
+	\begin{itemize}
+		\item Reordenar
+		\item Conversiones de Protocolo
+		\item Conversiones de direcciones
+		\item Tamaños máximos distintos
+	\end{itemize}
+	Un enrutador que puede manejar múltiples protocolos de red se denomina enrutador multiprotocolo. Éste debe traducir los protocolos o dejar una conexión para una capa de protocolo superior.
+	\subsubsection{Modelo de Circuitos virtuales concatenados}
+	Se contruye una ruta como sigue:
+	\begin{itemize}
+		\item La subred construye un \textbf{CV} al enrutador más cercano a la red de destino.
+		\item Luego la subred construye un \textbf{CV} de ese enrutador a una puerta de enlace externa. Esta registra la existencia del \textbf{CV} en sus tablas y procede a contruir otro \textbf{CV} a un enrutador de la siguiente subred.
+		\item Este proceso continua hasta llegar al host destino.
+	\end{itemize}
+
+	\par \textbf{Ventajas:} Puede reservarse búfferes por adelantado, puede garantizarse la secuencia , puede usarse encabezados cortos.
+	\par \textbf{Desventajas:} La falta de enrutamiento alterno para evitar áreas congestionadas y la vulnerabilidad a fallas de los enrutadores a lo largo de la ruta.
+
+	\subsubsection{Inter-redes no orientadas a la conexión}
+	Si cada red tiene su propio protocolo de capa de red no es posible que un paquete transite por otra. Hay que diseñar un paquete universal de interred y hacer que todos los reconozcan. (Este es el enfoque \textbf{IP})
+
+	\subsection{Entunelamiento}
+	Este caso es cuando el host de origen y el de destino están en el mismo tipo de red, pero hay una red diferente en medio	.
+	Para enviar un paquete \textbf{IP} a un host en la oficina de Londres, un host en la oficina de París construye el paquete que contiene
+una dirección IPv6 en Londres y la envía al enrutador multiprotocolo que conecta la red IPv6 de París con
+la Internet IPv4. Cuando este enrutador recibe el paquete IPv6, lo encapsula con un encabezado IPv4 dirigido al lado IPv4 del enrutador multiprotocolo que se conecta con la red IPv6 de Londres. Es decir, el
+enrutador coloca un paquete (\textit{IPv6}) dentro de un paquete (\textit{IPv4}). Cuando llega este paquete envuelto,
+el enrutador de Londres extrae el paquete IPv6 original y lo envía hacia el host de destino.
+
+	\begin{center}
+		\includegraphics[scale=0.3]{./imagenes/entunelamiento.png}
+	\end{center}
+
+	\subsection{Fragmentación}
+	Cuando un paquete grande quiere viajar a través de una red cuyo tamaño máximo de paquete es demasiado pequeño nos encontramos con que debemos \textbf{fragmentar el paquete}.
+	Existen dos estrategias:
+
+	\begin{itemize}
+		\item \textbf{Transparente:} En este método, cuando un paquete de tamaño excesivo
+llega a un enrutador, este lo divide en fragmentos. Cada fragmento es dirigido al mismo enrutador
+de salida, en donde se recombinan las piezas. De esta manera se ha hecho transparente el paso a
+través de la red de paquete pequeño. Las redes subsecuentes ni siquiera se enteran de que ha ocurrido
+una fragmentación.
+		\item \textbf{No transparente:} Una vez que se ha fragmentado un paquete, cada fragmento se trata como si fuera un paquete
+original. Los enrutadores pasan los fragmentos y la recombinación
+ocurre sólo en el host de destino.
+	\end{itemize}
+
+	\begin{center}
+		\includegraphics[scale=0.3]{./imagenes/fragmentacion.png}
+	\end{center}
+
+\section{La capa de internet}
+
+	\subsection{Principios de la capa de red}
+	\begin{itemize}
+		\item 1. Asegurarse de que funciona. No termine el diseño o estándar hasta que múltiples prototipos se hayan comunicado entre sí de manera exitosa.
+ 		\item 2. Mantener la simplicidad. Cuando tenga duda, utilice la solución más simple.
+ 		\item 3. Elegir opciones claras. Si hay varias maneras para realizar la misma tarea, elija sólo una.
+  		\item 4. Explotar la modularidad. Este principio lleva directamente a la idea de tener pilas de protocolos, cuyas capas sean independientes entre sí.
+		\item 5. Prevenir la heterogeneidad. En cualquier red grande habrán diferentes tipos de hardware, facilidades de transmisión y aplicaciones. Para manejarlos, el diseño de la red debe ser simple, general y flexible.
+		\item 6. Evitar las opciones y parámetros estáticos. Si los parámetros son inevitables (por ejemplo, el tamaño máximo del paquete), es mejor hacer que el emisor y el receptor negocien un valor que definir opciones fijas.
+		\item 7. Buscar un buen diseño no es necesario que sea perfecto. Con frecuencia, los diseñadores tienen
+un buen diseño pero éste no puede manejar algún caso especial.
+		\item 8. Ser estricto cuando envíe y tolerante cuando reciba. En otras palabras, sólo envíe paquetes que
+cumplan rigurosamente con los estándares, pero espere paquetes que tal vez no cumplan del todo
+y trate de lidiar con ellos.
+		\item 9. Pensar en la escalabilidad. Si el sistema debe manejar de manera efectiva millones de hosts y
+miles de millones de usuarios, la carga se debe dispersar de la manera más equitativa posible entre los recursos disponibles.
+		\item 10. Considerar el desempeño y el costo. Si una red tiene un desempeño pobre o un costo exagerado,
+nadie la utilizará.
+	\end{itemize}
+
+	\subsection{El protocolo IP versión 4}
+	Un datagrama IPv4 consiste en dos partes: el encabezado y el cuerpo o carga útil. El encabezado tiene una parte fija de 20 bytes y una parte opcional de longitud variable. Los bits se transmiten en orden de izquierda a derecha y de arriba hacia abajo, comenzando por el bit de mayor orden del campo \textit{Versión}.
+	
+	\begin{center}
+		\includegraphics[scale=0.3]{./imagenes/encabezadoIP.png} 
+	\end{center}
+	
+	\begin{itemize}
+		\item \textbf{Versión:} (\textit{4 bits}) Lleva el registro de la versión del protocolo a la que pertenece el datagrama (p.ej. IPv4).
+		\item \textbf{IHL:} (\textit{4 bits}) Indica la cantidad de palabras de 32 bits en el encabezado. El valor mínimo es de 5 (se usa cuando no hay opciones); el valor
+máximo es de 15, lo que limita el encabezado a 60 bytes, y por lo tanto el campo de opciones es de 40 bytes.
+		\item \textbf{Servicios Diferenciados:} (\textit{8 bits}) Este es uno de los pocos campos que ha cambiado su significado, originalmente era \textit{Tipo de Servicio}. Contaba con 6 bits, de los cuales , 3 eran para indicar la prioridad y 3 para indicar si a un host le
+preocupaba más el \textit{delay}, \textit{throughput} o la \textit{reliability}. Y los ultimos 2 bits no se utilizaban.
+		\item \textbf{Longitud Total:} (\textit{16 bits}) Incluye todo el datagrama, tanto el encabezado como los datos. La longitud máxima es de 65535 bytes.
+		\item \textbf{Identificación:} (\textit{16 bits}) Es necesario para que el host de destino determine a qué datagrama pertenece un
+fragmento recién llegado. (Todos los fragmentos de un datagrama contienen el mismo valor de identificación)
+		\item A continuación viene un bit sin uso
+		\item \textbf{DF:} (\textit{1 bit}) Cuando esta fijado en 1 significa no fragmentar.
+		\item \textbf{MF:} (\textit{1 bit}) Significa mas fragmentos, todos los fragmentos excepto el último tienen este bit activado.
+		\item \textbf{Desplazamiento del fragmento:} (13 bits) Indica a qué parte del paquete actual pertenece este fragmento. Todos los fragmentos excepto el último del datagrama deben ser un múltiplo de 8 bytes, que es la unidad de fragmentos elemental. Dado que se proporcionan 13 bits, puede haber un máximo de 8 192 fragmentos.
+		\item \textbf{Tiempo de vida:} (\textit{8 bits}) Es un contador que se utiliza para limitar el tiempo de vida de un paquete.
+		\item \textbf{Protocolo:} (\textit{8 bits}) Le indica a cuál proceso de transporte debe entregar el paquete.
+		\item \textbf{Suma de verificación:} (\textit{16bits}) El algoritmo suma todas las medias palabras de 16 bits del encabezado a medida que vayan llegando, mediante el uso de la aritmética de complemento a uno, y después obtiene el complemento a uno del resultado.
+		\item \textbf{Dirección de Origen y Destino:} (\textit{32 bits c/u}) Indican la dirección IP de las interfaces de red de la fuente y del destino.
+		\item \textbf{Opciones:} El campo de opciones ha sido diseñado para proveer un escape para permitir versiones subsecuentes del protocolo que incluyan
+información no presente en el diseño original, para permitir a los experimentadores probar nuevas ideas y evitar alojar bits de encabezado a información que es raramente necesitada. Las opciones son de longitud variable., y cada opción comienza con un código de 1 byte para identificarla. Algunas opciones tienen un campo de longitud de opción y luego uno o más bytes de datos. El campo de opciones ocupa un múltiplo de 4 bytes.
+	\end{itemize}
+	
+	\begin{center}
+		\includegraphics[scale=0.3]{./imagenes/opcionesIP.png} 
+	\end{center}
+	\subsection{Direcciónes IP}
+	Una característica que define a IPv4 consiste en sus direcciones de 32 bits. Cada host y enrutador de Internet tiene una dirección IP que se puede usar en los campos Dirección de origen y Dirección de destino de los paquetes IP. Es importante tener en cuenta que una dirección IP en realidad no se refiere a un host, sino
+a una interfaz de red, por lo que si un host está en dos redes, debe tener dos direcciones IP.
+	\subsubsection{Prefijos}
+	A diferencia de las direcciones Ethernet, las direcciones IP son jerárquicas. Cada dirección de 32 bits está
+	compuesta de una porción de red de longitud variable en los bits superiores, y de una porción de host en
+	los bits inferiores. La porción de red tiene el mismo valor para todos los hosts en una sola red, como una
+	LAN Ethernet. Esto significa que una red corresponde a un bloque contiguo de espacio de direcciones IP.
+	A este bloque se le llama prefijo.
+	\par En nuestro ejemplo, si el prefijo contiene $ 2^{8}$ direccciones y, por lo
+	tanto, deja 24 bits para la porción de red, se escribe como 128.208.0.0/24.
+	\par Como la longitud del prefijo no se puede inferir sólo a partir de la dirección IP, los protocolos de enrutamiento deben transportar los prefijos hasta los enrutadores. Algunas veces los prefijos se
+describen simplemente mediante su longitud, como en un “/16”, Cuando se escribe
+de esta forma, se denomina máscara de subred. Se puede aplicar un AND a la máscara de subred
+con la dirección IP para extraer sólo la porción de la red.
+
+	\begin{center}
+		\includegraphics[scale=0.3]{./imagenes/prefijomascara.png} 
+	\end{center}
+
+	\subsubsection{Subredes}
+	
+	La idea es permitir a una red que sea dividida en varias partes para uso interno pero que todavía actúe como una red simple para el mundo externo.
+	Cada subred puede ser una LAN que tiene un enrutador. Fuera de la red, una subred no es visible.	
+	\par Cuando llega un paquete, el enrutador analiza su dirección de destino y verifica a qué subred pertenece. Para ello, el enrutador aplica un AND a la dirección del destino con la máscara para cada subred y verifica que el resultado sea el prefijo correspondiente.
+	
+	\subsection{CIDR}
+
+	El objetivo de CIDR es reducir los tamaños de las tablas de enrutamiento. Para ello, se aplica la misma perspectiva que en las subredes: los enrutadores en distintas 			ubicaciones pueden saber acerca de una dirección IP dada que pertenece a prefijos de distintas zonas. A este proceso se le conoce como \textbf{agregación de prefijos}. 		\par Algunas veces al prefijo más grande resultante se le denomina superred para contrastar con las subredes como la división de bloques
+de direcciones.
+	\par Cuando llega un paquete primero se extrae su dirección de destino IP, luego se analiza la tabla de enrutamiento entrada por entrada. Hacer AND de la máscara de la entrada con la dirección de destino y comparar el resultado con la dirección IP de inicio de la subred de la entrada. Es posible que coincidan entradas múltiples (con diferentes longitudes de máscara de subred), en cuyo caso se usa la máscara más larga.
+	
+	\begin{center}
+		\includegraphics[scale=0.3]{./imagenes/agregacionPrefijosIP.png} 
+	\end{center}	
+	
+	\subsubsection{Direccionamiento con clases}
+	Antes de 1993, las direcciones IP se dividían en las cinco categorías. Esta asignación se denominó direccionamiento con clases.	
+	
+	\begin{center}
+		\includegraphics[scale=0.3]{./imagenes/clasesIP.png} 
+	\end{center}	
+	La dirección IP 0.0.0.0, que es la dirección más baja, es utilizada por los hosts al momento de encen-
+derlos. Significa “esta red” o “este host”. Las direcciones IP con 0 como número de red se refieren a la
+red actual.
+	\par La dirección que
+consiste sólo en 1s, o 255.255.255.255 (la dirección más alta), se utiliza para indicar a todos los hosts
+en la red especificada. Permite la difusión en la red local, por lo general una LAN.
+	\par Por último, todas
+las direcciones de la forma 127.xx.yy.zz se reservan para las pruebas de loopback. Los paquetes que se
+envían a esa dirección no se ponen en el cable; se procesan en forma local y se tratan como si fueran
+paquetes entrantes.
+	\subsection{NAT}
+	
+	La idea básica detrás de NAT es que el ISP asigne a cada hogar o negocio una sola dirección IP
+(o a lo más, una pequeña cantidad de éstas) para el tráfico de Internet. Dentro de la red del cliente, cada
+computadora obtiene una dirección IP única, la cual se utiliza para enrutar el tráfico interno. Sin embargo, justo antes de que un paquete salga de la red del cliente y vaya al ISP, la dirección IP única interna se traduce a la dirección IP pública compartida. Esta traducción hace uso de los tres rangos de direcciones
+IP que se han declarado como privados. Las redes pueden utilizarlos de manera interna como deseen. La
+única regla es que no pueden aparecer paquetes que contengan estas mismas direcciones en Internet. Los
+tres rangos reservados son:
+\par
+\par
+	\begin{center}
+	
+
+	\begin{tabular}{ccc}
+	10.0.0.0 & -10.255.255.255 & (16,777,216 hosts) \\ 
+	\par
+	172.16.0.0 & 172.31.255.255 & (1,048,576 hosts) \\ 
+	\par
+	192.168.0.0 & 192.168.255.255 & (65,536 hosts) \\ 
+	\par
+	\end{tabular} 
+	\end{center}
+	\par
+	\par En la figura 5-55 se muestra la operación de NAT. Dentro de las premisas del cliente, cada máquina
+tiene una dirección única de la forma 10.x.y.z. Sin embargo, antes de que un paquete salga de las premisas
+del cliente, pasa a través de una caja NAT que convierte la dirección IP de origen interna, 10.0.0.1 en
+la figura, a la dirección IP verdadera del cliente, 198.60.42.12 en este ejemplo.
+
+\par Cuando un proceso desea establecer una conexión TCP con un proceso remoto, se conecta a un puerto
+TCP sin usar en su propia máquina. Éste se conoce como \textbf{puerto de origen} y le indica al código TCP dónde enviar los paquetes entrantes que pertenecen a esta conexión. El proceso también proporciona un \textbf{puerto de destino} para indicar a quién se deben dar los paquetes en el lado remoto. Los puertos 0-1023 se reservan para los servicios conocidos.
+
+\par Siempre que un paquete de salida entra en la caja NAT, la dirección de origen 10.x.y.z se reemplaza por la verdadera dirección IP del cliente. Además, el campo Puerto de origen TCP se reemplaza por un índice en la tabla de traducción de 65 536 entradas de la caja NAT. Esta entrada de la tabla contiene el puerto de
+origen y la dirección IP originales. Finalmente, las sumas de verificación de los encabezados IP y TCP se recalculan e insertan en el paquete. Es necesario reemplazar el Puerto de origen, porque podría ocurrir que ambas conexiones de las máquinas 10.0.0.1 y 10.0.0.2 usaran el puerto 5 000, por ejemplo, así que el
+Puerto de origen no basta por sí solo para identificar el proceso de envío. Cuando un paquete llega a la caja NAT desde el ISP, el Puerto de origen en el encabezado TCP se
+extrae y utiliza como un índice en la tabla de asignación de la caja NAT. Desde la entrada localizada, la dirección IP interna y el Puerto de origen TCP se extraen e insertan en el paquete. Luego, las sumas de verificación de IP y TCP se recalculan e insertan en el paquete. Entonces el paquete se pasa al enrutador
+del cliente para su entrega normal mediante el uso de la dirección 10.x.y.z.
 
 \subsection{Protocolos de control de Internet}
 
