@@ -1,4 +1,4 @@
-redes.aux
-redes.log
-redes.toc
-redes.synctex.gz
+*.aux
+*.log
+*.toc
+*.synctex.gz
